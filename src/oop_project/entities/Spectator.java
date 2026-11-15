@@ -8,6 +8,8 @@
 
 package oop_project.entities;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Spectator extends Person {
@@ -17,24 +19,34 @@ public class Spectator extends Person {
 
     public Spectator(String id, String name, int age, String gender, List<Tickets> tickets, List<Transaction> purchases) {
         super(id, name, age, gender);
-        this.tickets = tickets;
-        this.purchases = purchases;
+        this.tickets = tickets == null ? new ArrayList<>() : new ArrayList<>(tickets);
+        this.purchases = purchases == null ? new ArrayList<>() : new ArrayList<>(purchases);
+    }
+
+    // Called by Fixture.sellTicket; use that rather than calling this directly
+    void addTicket(Tickets ticket) {
+        tickets.add(ticket);
+    }
+
+    // Called by Transaction.pay; use that rather than calling this directly
+    void addPurchase(Transaction transaction) {
+        purchases.add(transaction);
     }
 
     public List<Tickets> getTickets() {
-        return tickets;
+        return Collections.unmodifiableList(tickets);
     }
 
     public void setTickets(List<Tickets> tickets) {
-        this.tickets = tickets;
+        this.tickets = tickets == null ? new ArrayList<>() : new ArrayList<>(tickets);
     }
 
     public List<Transaction> getPurchases() {
-        return purchases;
+        return Collections.unmodifiableList(purchases);
     }
 
     public void setPurchases(List<Transaction> purchases) {
-        this.purchases = purchases;
+        this.purchases = purchases == null ? new ArrayList<>() : new ArrayList<>(purchases);
     }
 
     @Override

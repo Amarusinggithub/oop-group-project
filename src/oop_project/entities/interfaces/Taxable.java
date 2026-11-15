@@ -1,6 +1,6 @@
 /**
- * Author: Amar Campbell
- * Date: 10/29/2026
+ * Author: Shenecia Williams - 2501202
+ * Date: 11/14/2026
  * Description: This interface represents a taxable entity.
  * It defines a constant for the GCT (General Consumption Tax)
  * rate and a method to calculate the price with tax.
