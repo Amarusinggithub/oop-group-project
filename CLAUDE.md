@@ -95,14 +95,13 @@ src/oop_project/
 
 - **Dependencies point one way.** `menu` uses `entities` and `persistence`. Classes in `entities` never read input or print. Each menu catches `LeagueException`, prints its message and returns to the same menu.
 - **Keep `FootballLeague.saveData()` and `loadData()`.** They're in the UML, so they hand off to `LeagueFileManager` rather than being removed. Add the new menu and persistence classes to the UML diagram.
-- **Ownership follows the group roles in the SRS (appendix A.2).** Each member commits their own part:
+- **Each member owns their own parts.** `CONTRIBUTION_LOG.md` has the full task lists:
 
-  | Role | Owns |
-  |---|---|
-  | Lead | `Main`, `MainMenu`, `InputHelper` |
-  | Team and personnel | `TeamMenu`, `PersonnelMenu` |
-  | Fixtures and stadiums | Stadium, Fixture, Official and Results menus |
-  | Sales, persistence and quality | Ticket, Shop and Report menus, `persistence/`, `tests/` |
+  | Member | Menus | Tests | Also |
+  |---|---|---|---|
+  | Amar | `Main`, `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu` | `FixtureTests`, `PersistenceTests`, T-27 | `persistence/`, `DataFileException` |
+  | Kemece | `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu` | `TeamTests`, `ResultTests` | the SRS document |
+  | Shenecia | `TicketMenu`, `ShopMenu`, `ReportMenu` | `TestRunner`, `Check`, `TicketTests`, `ShopTests` | the presentation slides |
 
 - **Keep build output out of git.** That means `out/` and the runnable `KPFL.jar` built for the submission.
 - **A GUI is an optional extension.** If one is ever added, use Swing, which ships with the JDK. JavaFX would need an external library.

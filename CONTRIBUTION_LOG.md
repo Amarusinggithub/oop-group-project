@@ -12,6 +12,8 @@ Jamaican Football League and Match-Day Management System (KPFL): six-week OOP gr
 
 ## Tasks by member
 
+Each member owns entity classes plus one or more parts of every other folder: enums, exceptions, menus and tests. All the enums and exceptions already exist. The task for each one is to use it wherever its rule applies, and to prove it with a test.
+
 ### Amar Campbell (2501977)
 
 **Completed**
@@ -20,10 +22,24 @@ Jamaican Football League and Match-Day Management System (KPFL): six-week OOP gr
 **To do**
 - [ ] League classes (green in the UML diagram):
   - [ ] `FootballTeam` (empty stub so far)
-  - [ ] `FootballLeague` (drafted, not committed)
+  - [ ] `FootballLeague` (drafted)
   - [ ] `Fixture` (empty stub so far)
-  - [ ] `Stadium` (drafted, not committed)
-  - [ ] `MatchResult` (drafted, not committed)
+  - [ ] `Stadium` (drafted)
+  - [ ] `MatchResult` (drafted)
+- [ ] Persistence (`persistence/`):
+  - [ ] `LeagueFileManager`: load and save the `data/*.txt` files, writing through a temp file
+  - [ ] `ProductFile`: random-access `products.dat`, with stock updated after each paid sale
+  - [ ] `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
+  - [ ] Demo data in `data/`
+- [ ] Enums: `TeamStatus`, `FixtureStatus`, `FieldCondition`
+- [ ] Exceptions:
+  - [ ] `DataFileException` (empty so far): thrown for a bad line in a data file
+  - [ ] `TeamNotEligibleException`, `ScheduleConflictException` (teams and stadiums), `ResultNotRecordedException`
+- [ ] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
+- [ ] Tests:
+  - [ ] `FixtureTests` (T-08 to T-13)
+  - [ ] `PersistenceTests` (T-26)
+  - [ ] T-27 manual test (letters typed where a number is expected): screenshot in `docs/test-evidence/`
 
 ### Kemece Hinds (2501990)
 
@@ -39,6 +55,14 @@ Jamaican Football League and Match-Day Management System (KPFL): six-week OOP gr
   - [ ] `MatchOfficial`
   - [ ] `Spectator`
 - [ ] SRS document (in progress)
+- [ ] Enums: `PlayerStatus`
+- [ ] Exceptions:
+  - [ ] `InvalidDataException`: reject players under `Player.MIN_AGE` (the minimum-age rule; not enforced yet)
+  - [ ] `ScheduleConflictException`: stop a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
+- [ ] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
+- [ ] Tests:
+  - [ ] `TeamTests` (T-01 to T-07)
+  - [ ] `ResultTests` (T-17 to T-20, T-28)
 
 ### Shenecia Williams (2501202)
 
@@ -47,6 +71,15 @@ Jamaican Football League and Match-Day Management System (KPFL): six-week OOP gr
 
 **To do**
 - [ ] Presentation slides (in progress)
+- [ ] Enums: `TicketCategory`
+- [ ] Exceptions:
+  - [ ] `CapacityExceededException`: stop ticket sales going over the stadium's capacity
+  - [ ] `InsufficientPaymentException`, `OutOfStockException`: already thrown by `Transaction.pay`; still need tests
+- [ ] Menus: `TicketMenu`, `ShopMenu`, `ReportMenu`
+- [ ] Tests:
+  - [ ] `TestRunner` and `Check` (the runner and the PASS/FAIL printer). Do these first, because everyone's tests need them.
+  - [ ] `TicketTests` (T-14 to T-16)
+  - [ ] `ShopTests` (T-21 to T-25)
 
 ## Activity log
 
@@ -58,3 +91,4 @@ Jamaican Football League and Match-Day Management System (KPFL): six-week OOP gr
 | 2026-11-15 | Shenecia Williams | Merged the shop and ticket classes into `oop_project.entities`. `Ticket` became `Tickets` and now implements `Taxable`. `Transaction` was fixed to compile and gained payment, stock checks, GCT and receipts. Added `Spectator.addTicket` and `addPurchase`. | `Tickets.java`, `Transaction.java`, `Spectator.java` |
 | 2026-11-15 | Amar Campbell | Assigned the classes by UML colour: blue and `Person` to Kemece, green to Amar, orange to Shenecia | `docs/KPFL_UML_Class_Diagram.drawio` |
 | 2026-11-15 | Amar Campbell | Wrote the README: project summary, team and responsibilities, features, build, run and test steps, and layout | `README.md` |
+| 2026-11-15 | Amar Campbell | Assigned the enum, exception, menu and test work to each member, and took persistence | `CONTRIBUTION_LOG.md` |

@@ -8,11 +8,11 @@ A Java console application for managing a football league and its match days. It
 
 | Member | Student ID | Responsible for |
 |---|---|---|
-| Amar Campbell | 2501977 | League classes: `FootballTeam`, `FootballLeague`, `Fixture`, `Stadium`, `MatchResult` |
-| Kemece Hinds | 2501990 | Person hierarchy: `Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`; the SRS document |
-| Shenecia Williams | 2501202 | Shop and tickets: `Product`, `FoodItem`, `Merchandise`, `StadiumShop`, `Tickets`, `Transaction`; the presentation slides |
+| Amar Campbell | 2501977 | League classes (`FootballTeam`, `FootballLeague`, `Fixture`, `Stadium`, `MatchResult`); file storage; main, stadium and fixture menus; fixture and persistence tests |
+| Kemece Hinds | 2501990 | Person hierarchy (`Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`); team, personnel, official and results menus; team and result tests; the SRS document |
+| Shenecia Williams | 2501202 | Shop and tickets (`Product`, `FoodItem`, `Merchandise`, `StadiumShop`, `Tickets`, `Transaction`); ticket, shop and report menus; the test runner, plus ticket and shop tests; the presentation slides |
 
-The colours in the [UML class diagram](docs/KPFL_UML_Class_Diagram.drawio) match these assignments: blue is Kemece, green is Amar, orange is Shenecia.
+The colours in the [UML class diagram](docs/KPFL_UML_Class_Diagram.png) match the entity classes: blue is Kemece, green is Amar, orange is Shenecia. Each member also owns the enums and exceptions for their area. [`CONTRIBUTION_LOG.md`](CONTRIBUTION_LOG.md) has the full task lists.
 
 ## Features
 
