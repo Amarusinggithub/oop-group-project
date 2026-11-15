@@ -54,7 +54,7 @@ Each member owns entity classes plus one or more parts of every other folder: en
   - [ ] `LeagueCommissioner`
   - [ ] `MatchOfficial`
   - [ ] `Spectator`
-- [ ] SRS document (in progress)
+- [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
 - [ ] Enums: `PlayerStatus`
 - [ ] Exceptions:
   - [ ] `InvalidDataException`: reject players under `Player.MIN_AGE` (the minimum-age rule; not enforced yet)
@@ -92,3 +92,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-15 | Amar Campbell | Assigned the classes by UML colour: blue and `Person` to Kemece, green to Amar, orange to Shenecia | `docs/KPFL_UML_Class_Diagram.drawio` |
 | 2026-11-15 | Amar Campbell | Wrote the README: project summary, team and responsibilities, features, build, run and test steps, and layout | `README.md` |
 | 2026-11-15 | Amar Campbell | Assigned the enum, exception, menu and test work to each member, and took persistence | `CONTRIBUTION_LOG.md` |
+| 2026-11-15 | Amar Campbell | Added a reference SRS generated with Claude (AI) to guide Kemece's own SRS. It is not Kemece's work and not the group's final SRS. | `docs/KPFL_SRS_AI_Reference.pdf` |

@@ -58,7 +58,7 @@ java -cp out oop_project.Main
 The group decided on plain Java tests with no test library (no JUnit). The test files are still empty. When you write them:
 - Put them in the `oop_project.tests` package under `src/`, so the `javac` line above compiles them.
 - Run them with `java -cp out oop_project.tests.TestRunner`.
-- Name each check after its ID in the SRS test plan: T-01 to T-28 in appendix A.3. The plan covers normal, boundary and invalid cases for each business rule. The SRS is kept outside the repo.
+- Name each check after its ID in the SRS test plan: T-01 to T-28 in appendix A.3. The plan covers normal, boundary and invalid cases for each business rule. `docs/KPFL_SRS_AI_Reference.pdf` holds that test plan. It is an AI-generated reference SRS, there to guide Kemece's own SRS, so don't present it as Kemece's work or as the group's final `KPFL_SRS.pdf`.
 - Print PASS or FAIL for every check, with the expected and actual result. The final submission uses that output as its test "results and evidence".
 - T-27 (letters typed where a number is expected) is a manual console test. Its evidence is a screenshot in `docs/test-evidence/`.
 - `PersistenceTests` saves to a temp folder, never to `data/`, so it can't overwrite the demo data.
