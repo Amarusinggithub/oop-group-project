@@ -1,5 +1,5 @@
 /**
- * Author: Amar Campbell
+ * Author: Kemece Hinds - 2501990
  * Date: 10/29/2026
  * Description: This class represents a player in the football team management system.
  * It extends the Person class and adds specific attributes related to a player, such

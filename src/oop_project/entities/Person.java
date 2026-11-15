@@ -1,5 +1,5 @@
 /**
- * Author: Amar Campbell
+ * Author: Kemece Hinds - 2501990
  * Date: 10/29/2026
  * Description: This class represents a person in the football team management system.
  * It is an abstract class that provides a base for other classes like Coach and Player.
