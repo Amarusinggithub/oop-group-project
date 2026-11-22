@@ -1,0 +1,12 @@
+C001,Desmond Tulloch,40,Male,CONCACAF B Licence,Head Coach,KPFL01
+C009,Marvin Hylton,33,Male,UEFA B Licence,Goalkeeper Coach,KPFL01
+C002,Garfield Ellis,55,Male,CONCACAF A Licence,Head Coach,KPFL02
+C010,Tamika Gayle-Ross,33,Female,JFF C Licence,Assistant Coach,KPFL02
+C003,Paul Wedderburn,45,Male,CONCACAF B Licence,Head Coach,KPFL03
+C004,Rudolph Beckford,49,Male,CONCACAF A Licence,Head Coach,KPFL04
+C011,Neville Grant,47,Male,UEFA B Licence,Goalkeeper Coach,KPFL04
+C005,Clyde Edwards,44,Male,CONCACAF B Licence,Head Coach,KPFL05
+C006,Linval Ashman,48,Male,CONCACAF A Licence,Head Coach,KPFL06
+C012,Andrea Lynch,37,Female,JFF C Licence,Assistant Coach,KPFL06
+C007,Sean Mullings,55,Male,CONCACAF B Licence,Head Coach,KPFL07
+C008,Errol Whittaker,49,Male,CONCACAF A Licence,Head Coach,KPFL08

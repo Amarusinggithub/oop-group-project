@@ -1,0 +1,4 @@
+ST01,National Stadium,Kingston,35000,GOOD,1500.00
+ST02,Anthony Spaulding Sports Complex,Kingston,7000,EXCELLENT,1000.00
+ST03,Harbour View Mini Stadium,Kingston,5000,GOOD,800.00
+ST04,Ferdi Neita Sports Complex,Portmore,3000,POOR,800.00
