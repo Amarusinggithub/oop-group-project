@@ -44,10 +44,10 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
 - [x] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
 - [x] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
+- [x] Tests: `TeamTests` (T-01 to T-07)
+- [x] Tests: `ResultTests` (T-17 to T-20, T-28)
 
 **To do**
-- [ ] Tests: `TeamTests` (T-01 to T-07)
-- [ ] Tests: `ResultTests` (T-17 to T-20, T-28)
 - [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
 
 ### Shenecia Williams (2501202)
@@ -84,3 +84,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Kemece Hinds | Menus: `TeamMenu` (register, update, search, display, approve or suspend), `PersonnelMenu` (players, goals and coaches), `OfficialMenu` (officials, assignment, inspection, commissioner) and `ResultsMenu` (results and standings). | `menu/TeamMenu.java`, `menu/PersonnelMenu.java`, `menu/OfficialMenu.java`, `menu/ResultsMenu.java` |
 | 2026-11-21 | Shenecia Williams | Menus: `TicketMenu` (sales with GCT by category, seats remaining), `ShopMenu` (products, sales with payment, change and receipt, stock written to `products.dat`) and `ReportMenu` (six reports RPT-01 to RPT-06 and searches SR-01 to SR-04). | `menu/TicketMenu.java`, `menu/ShopMenu.java`, `menu/ReportMenu.java` |
 | 2026-11-21 | Shenecia Williams | Tests: `TestRunner` and `Check` (PASS or FAIL with expected and actual), `TicketTests` (T-14 to T-16) and `ShopTests` (T-21 to T-25). | `tests/TestRunner.java`, `tests/Check.java`, `tests/TicketTests.java`, `tests/ShopTests.java` |
+| 2026-11-21 | Kemece Hinds | Tests: `TeamTests` (T-01 to T-07) and `ResultTests` (T-17 to T-20, T-28). | `tests/TeamTests.java`, `tests/ResultTests.java` |
