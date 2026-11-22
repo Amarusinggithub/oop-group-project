@@ -43,9 +43,9 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Enums: `PlayerStatus`
 - [x] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
 - [x] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
+- [x] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
 
 **To do**
-- [ ] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
 - [ ] Tests: `TeamTests` (T-01 to T-07)
 - [ ] Tests: `ResultTests` (T-17 to T-20, T-28)
 - [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
@@ -81,3 +81,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Shenecia Williams | Shop rules: `Transaction.addItem` throws `InvalidDataException` for a quantity below 1 and `OutOfStockException` beyond the stock; added `removeItem`, `StadiumShop.cancelTransaction`, and restoring paid sales when data is loaded. | `Transaction.java`, `StadiumShop.java` |
 | 2026-11-21 | Amar Campbell | Persistence: `LeagueFileManager` saves the sequential `.txt` files through temporary files and loads them in ID order, skipping and reporting bad lines; `ProductFile` keeps every shop's products in fixed-length records in `products.dat` and rewrites one product's stock in place. `saveData` and `loadData` hand off to them. Added the demo league to `data/`. | `persistence/`, `data/` |
 | 2026-11-21 | Amar Campbell | Console: `Main` loads the data and opens `MainMenu` (ten areas, save, and save-on-exit); `InputHelper` checks every number, date, time and Y/N answer and shows numbered lists; `StadiumMenu` and `FixtureMenu`. | `Main.java`, `menu/MainMenu.java`, `menu/InputHelper.java`, `menu/StadiumMenu.java`, `menu/FixtureMenu.java` |
+| 2026-11-21 | Kemece Hinds | Menus: `TeamMenu` (register, update, search, display, approve or suspend), `PersonnelMenu` (players, goals and coaches), `OfficialMenu` (officials, assignment, inspection, commissioner) and `ResultsMenu` (results and standings). | `menu/TeamMenu.java`, `menu/PersonnelMenu.java`, `menu/OfficialMenu.java`, `menu/ResultsMenu.java` |
