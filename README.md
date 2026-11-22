@@ -2,7 +2,7 @@
 
 A Java console application for managing a football league and its match days. It handles teams and personnel, stadiums, fixtures and officials, results and standings, ticket sales and the stadium shop. This is a six-week object-oriented programming group project. The brief is in [`docs/Jamaican_Football_League_6_Week_OOP_Group_Project.pdf`](docs/Jamaican_Football_League_6_Week_OOP_Group_Project.pdf).
 
-> **Status: in progress.** Most of the entity classes are written, but the console menus, file storage and tests are still empty placeholders. The project won't compile until `Fixture` and `FootballTeam` are written. See [`CONTRIBUTION_LOG.md`](CONTRIBUTION_LOG.md) for who is doing what.
+> **Status: feature-complete.** The entities, console menus, file storage, sample data and tests are written, and all 83 test checks pass. The SRS, test plan, reflections and presentation are still to be finished. See [`CONTRIBUTION_LOG.md`](CONTRIBUTION_LOG.md) for who is doing what.
 
 ## Team
 
@@ -48,13 +48,17 @@ java -cp out oop_project.Main
 
 You can also open the folder in IntelliJ IDEA and run `oop_project.Main`. Build output goes to `out/`, which git ignores.
 
+The program loads the sample league from `data/` at start-up, and writes it back when you choose **Save data** or save on exit. To use a different folder, pass its path as the first argument. The [user guide](docs/User_Guide.md) explains every menu option.
+
 ## Tests
 
-The tests are plain Java, with no JUnit. They live in `src/oop_project/tests/`, and each check is named after its ID in the SRS test plan (T-01 to T-28). Once they're written, run them with:
+The tests are plain Java, with no JUnit. They live in `src/oop_project/tests/`, and each check is named after its ID in the SRS test plan (T-01 to T-28). After compiling, run them with:
 
 ```bash
 java -cp out oop_project.tests.TestRunner
 ```
+
+Each check prints PASS or FAIL with the expected and actual result, and the run ends with a summary. The latest output is saved in [`docs/test-evidence/test-run-output.txt`](docs/test-evidence/test-run-output.txt). T-27 (letters typed where a number is expected) is a manual console test; its transcript is in [`docs/test-evidence/`](docs/test-evidence/).
 
 ## Project layout
 
@@ -68,11 +72,21 @@ src/oop_project/
   menu/              one console menu class per area, plus InputHelper
   persistence/       LeagueFileManager (text files), ProductFile (random-access file)
   tests/             TestRunner and the test classes
-data/                demo data, loaded at start-up and written on Save
-docs/                brief, UML diagram, and the submission documents as they're written
+data/                sample league, loaded at start-up and written on Save
+                     (sequential .txt files, plus products.dat, a random-access file)
+docs/                brief, UML diagram, user guide, technical report, test evidence,
+                     and the other submission documents as they're written
 CONTRIBUTION_LOG.md  who did what, and what's still to do
 ```
 
 ## Submission documents
 
-Once they're written, these will be in `docs/`: the SRS, the test plan and results (with screenshots in `docs/test-evidence/`), the user guide, the technical report, each member's reflection (`docs/reflections/`) and the presentation slides (`docs/presentation/`).
+These are in `docs/`, or will be once they're written:
+- the SRS
+- the test plan and results, with evidence in `docs/test-evidence/`
+- the [user guide](docs/User_Guide.md) (drafted)
+- the [technical report](docs/Technical_Report.md) (drafted)
+- each member's reflection (`docs/reflections/`)
+- the presentation slides (`docs/presentation/`)
+
+The user guide and technical report are drafted in Markdown and get exported to PDF for the submission.

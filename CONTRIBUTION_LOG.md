@@ -30,10 +30,10 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Tests: `FixtureTests` (T-08 to T-13)
 - [x] Tests: `PersistenceTests` (T-26)
 - [x] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
+- [x] UML diagram updated for the finished code, and the PNG export refreshed
+- [x] Drafts of the user guide and technical report (`docs/*.md`)
 
 **To do**
-- [ ] UML diagram updated for the finished code, and the PNG export refreshed
-- [ ] Drafts of the user guide and technical report (`docs/*.md`)
 - [ ] T-27 manual test: add a screenshot of the run to `docs/test-evidence/`
 
 ### Kemece Hinds (2501990)
@@ -64,6 +64,15 @@ Each member owns entity classes plus one or more parts of every other folder: en
 **To do**
 - [ ] Presentation slides (in progress)
 
+### Whole group
+
+**To do**
+- [ ] Confirm the minimum player age (16 is assumed) with the lecturer
+- [ ] Review the drafts of `docs/User_Guide.md` and `docs/Technical_Report.md`, then export them to PDF
+- [ ] Test plan and results document (`docs/Test_Plan_and_Results.pdf`), using `docs/test-evidence/`
+- [ ] List sources and AI assistance in the technical report, as the course policy requires
+- [ ] Each member's reflection in `docs/reflections/`
+
 ## Activity log
 
 | Date | Member | Work | Evidence |
@@ -86,3 +95,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Shenecia Williams | Tests: `TestRunner` and `Check` (PASS or FAIL with expected and actual), `TicketTests` (T-14 to T-16) and `ShopTests` (T-21 to T-25). | `tests/TestRunner.java`, `tests/Check.java`, `tests/TicketTests.java`, `tests/ShopTests.java` |
 | 2026-11-21 | Kemece Hinds | Tests: `TeamTests` (T-01 to T-07) and `ResultTests` (T-17 to T-20, T-28). | `tests/TeamTests.java`, `tests/ResultTests.java` |
 | 2026-11-21 | Amar Campbell | Tests: `FixtureTests` (T-08 to T-13) and `PersistenceTests` (T-26). Saved the full test run (83 checks, all passing) and the T-27 console transcript as evidence. | `tests/FixtureTests.java`, `tests/PersistenceTests.java`, `docs/test-evidence/` |
+| 2026-11-21 | Amar Campbell | Updated the UML diagram for the finished code (new members, the menu and persistence classes, "(has-a)" labels) and re-exported the PNG; drafted the user guide and technical report; updated the README and project guide. | `docs/KPFL_UML_Class_Diagram.drawio`, `docs/KPFL_UML_Class_Diagram.png`, `docs/User_Guide.md`, `docs/Technical_Report.md`, `README.md`, `CLAUDE.md` |
