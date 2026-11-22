@@ -18,28 +18,23 @@ Each member owns entity classes plus one or more parts of every other folder: en
 
 **Completed**
 - [x] Initial repository, README and UML class diagram
+- [x] League classes (green in the UML diagram): `FootballTeam`, `FootballLeague`, `Fixture`, `Stadium`, `MatchResult`
+- [x] Enums: `TeamStatus`, `FixtureStatus`, `FieldCondition`
+- [x] Exceptions: `TeamNotEligibleException`, `ScheduleConflictException` (teams and stadiums), `ResultNotRecordedException`
 
 **To do**
-- [ ] League classes (green in the UML diagram):
-  - [ ] `FootballTeam` (empty stub so far)
-  - [ ] `FootballLeague` (drafted)
-  - [ ] `Fixture` (empty stub so far)
-  - [ ] `Stadium` (drafted)
-  - [ ] `MatchResult` (drafted)
-- [ ] Persistence (`persistence/`):
-  - [ ] `LeagueFileManager`: load and save the `data/*.txt` files, writing through a temp file
-  - [ ] `ProductFile`: random-access `products.dat`, with stock updated after each paid sale
-  - [ ] `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
-  - [ ] Demo data in `data/`
-- [ ] Enums: `TeamStatus`, `FixtureStatus`, `FieldCondition`
-- [ ] Exceptions:
-  - [ ] `DataFileException` (empty so far): thrown for a bad line in a data file
-  - [ ] `TeamNotEligibleException`, `ScheduleConflictException` (teams and stadiums), `ResultNotRecordedException`
+- [ ] Persistence: `LeagueFileManager` (load and save the `data/*.txt` files, writing through a temp file)
+- [ ] Persistence: `ProductFile` (random-access `products.dat`, with stock updated after each paid sale)
+- [ ] Persistence: `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
+- [ ] Exception: `DataFileException`, thrown for a bad line in a data file
+- [ ] Demo data in `data/`
 - [ ] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
-- [ ] Tests:
-  - [ ] `FixtureTests` (T-08 to T-13)
-  - [ ] `PersistenceTests` (T-26)
-  - [ ] T-27 manual test (letters typed where a number is expected): screenshot in `docs/test-evidence/`
+- [ ] Tests: `FixtureTests` (T-08 to T-13)
+- [ ] Tests: `PersistenceTests` (T-26)
+- [ ] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
+- [ ] UML diagram updated for the finished code, and the PNG export refreshed
+- [ ] Drafts of the user guide and technical report (`docs/*.md`)
+- [ ] T-27 manual test: add a screenshot of the run to `docs/test-evidence/`
 
 ### Kemece Hinds (2501990)
 
@@ -47,22 +42,14 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - _None recorded yet_
 
 **To do**
-- [ ] Person hierarchy (blue in the UML diagram, plus `Person`). In progress:
-  - [ ] `Person`
-  - [ ] `Player`
-  - [ ] `Coach`
-  - [ ] `LeagueCommissioner`
-  - [ ] `MatchOfficial`
-  - [ ] `Spectator`
-- [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
+- [ ] Person hierarchy (blue in the UML diagram, plus `Person`): `Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`
 - [ ] Enums: `PlayerStatus`
-- [ ] Exceptions:
-  - [ ] `InvalidDataException`: reject players under `Player.MIN_AGE` (the minimum-age rule; not enforced yet)
-  - [ ] `ScheduleConflictException`: stop a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
+- [ ] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
+- [ ] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
 - [ ] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
-- [ ] Tests:
-  - [ ] `TeamTests` (T-01 to T-07)
-  - [ ] `ResultTests` (T-17 to T-20, T-28)
+- [ ] Tests: `TeamTests` (T-01 to T-07)
+- [ ] Tests: `ResultTests` (T-17 to T-20, T-28)
+- [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
 
 ### Shenecia Williams (2501202)
 
@@ -70,16 +57,13 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Shop and ticket classes (orange in the UML diagram): `Product`, `FoodItem`, `Merchandise`, `StadiumShop`, `Taxable`, `Tickets`, `Transaction`
 
 **To do**
-- [ ] Presentation slides (in progress)
 - [ ] Enums: `TicketCategory`
-- [ ] Exceptions:
-  - [ ] `CapacityExceededException`: stop ticket sales going over the stadium's capacity
-  - [ ] `InsufficientPaymentException`, `OutOfStockException`: already thrown by `Transaction.pay`; still need tests
+- [ ] Shop rules: `Transaction.addItem` refuses a zero quantity and more than is in stock; abandoned sales can be cancelled
 - [ ] Menus: `TicketMenu`, `ShopMenu`, `ReportMenu`
-- [ ] Tests:
-  - [ ] `TestRunner` and `Check` (the runner and the PASS/FAIL printer). Do these first, because everyone's tests need them.
-  - [ ] `TicketTests` (T-14 to T-16)
-  - [ ] `ShopTests` (T-21 to T-25)
+- [ ] Tests: `TestRunner` and `Check` (the runner and the PASS/FAIL printer)
+- [ ] Tests: `TicketTests` (T-14 to T-16), proving `CapacityExceededException`
+- [ ] Tests: `ShopTests` (T-21 to T-25), proving `InsufficientPaymentException` and `OutOfStockException`
+- [ ] Presentation slides (in progress)
 
 ## Activity log
 
@@ -93,3 +77,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-15 | Amar Campbell | Wrote the README: project summary, team and responsibilities, features, build, run and test steps, and layout | `README.md` |
 | 2026-11-15 | Amar Campbell | Assigned the enum, exception, menu and test work to each member, and took persistence | `CONTRIBUTION_LOG.md` |
 | 2026-11-15 | Amar Campbell | Added a reference SRS generated with Claude (AI) to guide Kemece's own SRS. It is not Kemece's work and not the group's final SRS. | `docs/KPFL_SRS_AI_Reference.pdf` |
+| 2026-11-21 | Amar Campbell | League classes: wrote `FootballTeam` (squad and coaching staff, squad-size, minimum-age and jersey rules, match record and points) and `Fixture` (scheduled/completed/cancelled lifecycle, eligibility check, clashes, officials, ticket sales within capacity, results). Added lookups, spectators, reschedule and cancel, and separate standings, fixtures and shop-sales reports to `FootballLeague`. Finished `DataFileException`. | `FootballTeam.java`, `Fixture.java`, `FootballLeague.java`, `DataFileException.java` |
