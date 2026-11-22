@@ -27,11 +27,11 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Exception: `DataFileException`, thrown for a bad line in a data file
 - [x] Demo data in `data/`
 - [x] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
+- [x] Tests: `FixtureTests` (T-08 to T-13)
+- [x] Tests: `PersistenceTests` (T-26)
+- [x] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
 
 **To do**
-- [ ] Tests: `FixtureTests` (T-08 to T-13)
-- [ ] Tests: `PersistenceTests` (T-26)
-- [ ] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
 - [ ] UML diagram updated for the finished code, and the PNG export refreshed
 - [ ] Drafts of the user guide and technical report (`docs/*.md`)
 - [ ] T-27 manual test: add a screenshot of the run to `docs/test-evidence/`
@@ -85,3 +85,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Shenecia Williams | Menus: `TicketMenu` (sales with GCT by category, seats remaining), `ShopMenu` (products, sales with payment, change and receipt, stock written to `products.dat`) and `ReportMenu` (six reports RPT-01 to RPT-06 and searches SR-01 to SR-04). | `menu/TicketMenu.java`, `menu/ShopMenu.java`, `menu/ReportMenu.java` |
 | 2026-11-21 | Shenecia Williams | Tests: `TestRunner` and `Check` (PASS or FAIL with expected and actual), `TicketTests` (T-14 to T-16) and `ShopTests` (T-21 to T-25). | `tests/TestRunner.java`, `tests/Check.java`, `tests/TicketTests.java`, `tests/ShopTests.java` |
 | 2026-11-21 | Kemece Hinds | Tests: `TeamTests` (T-01 to T-07) and `ResultTests` (T-17 to T-20, T-28). | `tests/TeamTests.java`, `tests/ResultTests.java` |
+| 2026-11-21 | Amar Campbell | Tests: `FixtureTests` (T-08 to T-13) and `PersistenceTests` (T-26). Saved the full test run (83 checks, all passing) and the T-27 console transcript as evidence. | `tests/FixtureTests.java`, `tests/PersistenceTests.java`, `docs/test-evidence/` |

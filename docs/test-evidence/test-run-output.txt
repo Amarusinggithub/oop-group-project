@@ -1,0 +1,271 @@
+KPFL test run - 2026-11-21 19:25
+Java 26.0.2.1
+
+== TeamTests (T-01 to T-07): teams, squads and the minimum age
+PASS  T-01  Register team T1 "Harbour View", Kingston, max squad 25 (normal)
+            expected: completed
+            actual:   completed
+PASS  T-01  New team's status
+            expected: Pending
+            actual:   Pending
+PASS  T-01  Search "  harbour VIEW " ignores case and spaces
+            expected: Harbour View
+            actual:   Harbour View
+PASS  T-02  Register another team with registration no. "t1" (invalid)
+            expected: InvalidDataException
+            actual:   InvalidDataException: A team with registration number t1 is already registered.
+PASS  T-02  Teams registered after the refusal
+            expected: 1
+            actual:   1
+PASS  T-03  Add a 16-year-old player (boundary)
+            expected: completed
+            actual:   completed
+PASS  T-03  Squad size after adding
+            expected: 1
+            actual:   1
+PASS  T-04  Add a 15-year-old player (invalid)
+            expected: InvalidDataException
+            actual:   InvalidDataException: Junior Gordon is under the league's minimum age of 16.
+PASS  T-04  Squad size is unchanged
+            expected: 1
+            actual:   1
+PASS  T-05  Add the player that fills the last squad place (boundary)
+            expected: completed
+            actual:   completed
+PASS  T-05  Squad size equals the maximum
+            expected: 2
+            actual:   2
+PASS  T-06  Add one more player to the full squad (invalid)
+            expected: CapacityExceededException
+            actual:   CapacityExceededException: Small Squad FC's squad is full (2 players).
+PASS  T-06  Squad size is unchanged
+            expected: 2
+            actual:   2
+PASS  T-07  Add a player with a jersey number already worn in the team (invalid)
+            expected: InvalidDataException: Jersey number 10 is already worn by Kevaughn Brown.
+            actual:   InvalidDataException: Jersey number 10 is already worn by Kevaughn Brown.
+
+== FixtureTests (T-08 to T-13): fixtures, clashes and officials
+PASS  T-08  Create a fixture with a pending team (invalid)
+            expected: TeamNotEligibleException
+            actual:   TeamNotEligibleException: Arnett Gardens is pending and cannot be assigned to a fixture.
+PASS  T-08  Create a fixture with a suspended team (invalid)
+            expected: TeamNotEligibleException
+            actual:   TeamNotEligibleException: Tivoli Gardens is suspended and cannot be assigned to a fixture.
+PASS  T-08  No fixture was created
+            expected: 0
+            actual:   0
+PASS  T-09  Create a fixture between two registered teams (normal)
+            expected: FX001
+            actual:   FX001
+PASS  T-09  Fixture is shown with teams, date and time
+            expected: Harbour View vs Waterhouse on 2026-12-05 at 15:00
+            actual:   Harbour View vs Waterhouse on 2026-12-05 at 15:00
+PASS  T-09  Stadium records the teams of its current fixture
+            expected: [Harbour View, Waterhouse]
+            actual:   [Harbour View, Waterhouse]
+PASS  T-10  Same team, same date and time, another stadium (invalid)
+            expected: ScheduleConflictException
+            actual:   ScheduleConflictException: Harbour View already plays in Harbour View vs Waterhouse on 2026-12-05 at 15:00.
+PASS  T-11  Same team, same date, kick-off one hour later (boundary)
+            expected: FX002
+            actual:   FX002
+PASS  T-12  Different teams, same stadium, same date and time (invalid)
+            expected: ScheduleConflictException
+            actual:   ScheduleConflictException: National Stadium is already hosting Harbour View vs Waterhouse on 2026-12-05 at 15:00.
+PASS  T-13  Assign the referee to FX001 (set-up)
+            expected: completed
+            actual:   completed
+PASS  T-13  Assign an official already booked at the same date and time (invalid)
+            expected: ScheduleConflictException
+            actual:   ScheduleConflictException: Kemar Whyte is already officiating Harbour View vs Waterhouse on 2026-12-05 at 15:00.
+PASS  T-13  The referee still has one fixture
+            expected: 1
+            actual:   1
+PASS  T-13  The same referee can take the 16:00 fixture (boundary)
+            expected: completed
+            actual:   completed
+PASS  T-12  After cancelling FX001, its stadium slot can be booked again (boundary)
+            expected: completed
+            actual:   completed
+PASS  T-09  A team cannot play itself (invalid)
+            expected: IllegalArgumentException
+            actual:   IllegalArgumentException: A team cannot play itself.
+
+== TicketTests (T-14 to T-16): ticket sales and capacity
+PASS  T-14  Capacity 3: sell the 3rd ticket (boundary)
+            expected: completed
+            actual:   completed
+PASS  T-14  Seats remaining
+            expected: 0
+            actual:   0
+PASS  T-14  The spectator holds all three tickets
+            expected: 3
+            actual:   3
+PASS  T-15  Sell a 4th ticket (invalid)
+            expected: CapacityExceededException
+            actual:   CapacityExceededException: Sabina Park is sold out for Harbour View vs Waterhouse on 2026-12-05 at 15:00.
+PASS  T-15  Tickets sold is unchanged
+            expected: 3
+            actual:   3
+PASS  T-16  VIP ticket at a base price of $1,000.00 (normal)
+            expected: $2,875.00
+            actual:   $2,875.00
+PASS  T-16  VIP base price before GCT
+            expected: $2,500.00
+            actual:   $2,500.00
+PASS  T-16  Ticket number
+            expected: FX002-T0001
+            actual:   FX002-T0001
+PASS  T-16  Fixture ticket revenue including GCT
+            expected: $2,875.00
+            actual:   $2,875.00
+
+== ResultTests (T-17 to T-20, T-28): results, points and standings
+PASS  T-17  Complete a fixture with no result (invalid)
+            expected: ResultNotRecordedException
+            actual:   ResultNotRecordedException: Record a result for Harbour View vs Waterhouse on 2026-12-05 at 15:00 before completing it.
+PASS  T-17  Fixture is still scheduled
+            expected: SCHEDULED
+            actual:   SCHEDULED
+PASS  T-18  Record a score of -1 to 0 (invalid)
+            expected: InvalidDataException
+            actual:   InvalidDataException: Match scores cannot be negative.
+PASS  T-18  Fixture is still scheduled and has no result
+            expected: SCHEDULED, no result
+            actual:   SCHEDULED, no result
+PASS  T-19  Record 2-1 for the home team (normal)
+            expected: completed
+            actual:   completed
+PASS  T-19  Home team points
+            expected: 3
+            actual:   3
+PASS  T-19  Away team points
+            expected: 0
+            actual:   0
+PASS  T-19  Fixture status
+            expected: COMPLETED
+            actual:   COMPLETED
+PASS  T-19  Winner
+            expected: Harbour View
+            actual:   Harbour View
+PASS  T-19  A completed fixture cannot be given another result
+            expected: IllegalStateException
+            actual:   IllegalStateException: Fixture FX001 is completed and can no longer be changed.
+PASS  T-20  Record 1-1 (normal)
+            expected: completed
+            actual:   completed
+PASS  T-20  Each team's points
+            expected: 1 and 1
+            actual:   1 and 1
+PASS  T-28  Standings after T-19 and T-20 (normal)
+            expected: [Harbour View 3, Cavalier 1, Portmore United 1, Waterhouse 0]
+            actual:   [Harbour View 3, Cavalier 1, Portmore United 1, Waterhouse 0]
+PASS  T-28  Goal difference of the leader and the last team
+            expected: +1 and -1
+            actual:   +1 and -1
+
+== ShopTests (T-21 to T-25): shop sales, GCT and payment
+PASS  T-21  Add a product to a sale with quantity 0 (invalid)
+            expected: InvalidDataException
+            actual:   InvalidDataException: Quantity must be at least 1.
+PASS  T-21  Add a product to a sale with quantity -1 (invalid)
+            expected: InvalidDataException
+            actual:   InvalidDataException: Quantity must be at least 1.
+PASS  T-22  Ask for 2 of a product with 1 in stock (invalid)
+            expected: OutOfStockException
+            actual:   OutOfStockException: Only 1 of Ting in stock.
+PASS  T-22  The sale has no items
+            expected: 0
+            actual:   0
+PASS  T-22  Two open sales each add the last Ting
+            expected: completed
+            actual:   completed
+PASS  T-22  Paying for the Ting after it sold out (invalid)
+            expected: OutOfStockException
+            actual:   OutOfStockException: Only 0 of Ting left in stock.
+PASS  T-22  Ting stock after the refused payment
+            expected: 0
+            actual:   0
+PASS  T-23  Pay $11,000.00 for a total of $11,557.50 (invalid)
+            expected: InsufficientPaymentException
+            actual:   InsufficientPaymentException: Payment of $11000.00 is less than the total of $11557.50.
+PASS  T-23  Stock unchanged (jerseys, patties) and sale unpaid
+            expected: 10, 20, unpaid
+            actual:   10, 20, unpaid
+PASS  T-24  Pay exactly $11,557.50 (boundary): change
+            expected: $0.00
+            actual:   $0.00
+PASS  T-24  Sale completes
+            expected: true
+            actual:   true
+PASS  T-25  Subtotal (normal)
+            expected: $10,050.00
+            actual:   $10,050.00
+PASS  T-25  GCT at 15%
+            expected: $1,507.50
+            actual:   $1,507.50
+PASS  T-25  Total
+            expected: $11,557.50
+            actual:   $11,557.50
+PASS  T-25  Change from $12,000.00
+            expected: $442.50
+            actual:   $442.50
+PASS  T-25  Stock reduced (jerseys, patties) after both paid sales
+            expected: 6, 14
+            actual:   6, 14
+PASS  T-25  The spectator's purchases
+            expected: 3
+            actual:   3
+PASS  T-25  Shop sales count only paid sales
+            expected: $23,402.50
+            actual:   $23,402.50
+PASS  T-25  Receipt shows the change
+            expected: true
+            actual:   true
+
+== PersistenceTests (T-26): save and reload
+PASS  T-26  Save, restart and load: lines skipped
+            expected: []
+            actual:   []
+PASS  T-26  Record counts after reloading
+            expected: 2 stadiums, 3 teams, 3 players, 2 coaches, 2 officials, commissioner LC01, 3 fixtures, 3 tickets, 2 spectators, 3 products, 1 paid sales
+            actual:   2 stadiums, 3 teams, 3 players, 2 coaches, 2 officials, commissioner LC01, 3 fixtures, 3 tickets, 2 spectators, 3 products, 1 paid sales
+PASS  T-26  Standings after reloading
+            expected: [Harbour View P1 Pts3 GD1, Arnett Gardens P0 Pts0 GD0, Waterhouse P1 Pts0 GD-1]
+            actual:   [Harbour View P1 Pts3 GD1, Arnett Gardens P0 Pts0 GD0, Waterhouse P1 Pts0 GD-1]
+PASS  T-26  Shop sales after reloading
+            expected: $11,557.50
+            actual:   $11,557.50
+PASS  T-26  Records saved the first and second time
+            expected: 23
+            actual:   23
+PASS  T-26  Every record identical to before saving (files that differ)
+            expected: []
+            actual:   []
+PASS  T-26  products.dat stock updated in place after a sale
+            expected: true, 7
+            actual:   true, 7
+PASS  T-26  products.dat size unchanged by the in-place update
+            expected: 729
+            actual:   729
+PASS  T-26  products.dat holds whole fixed-length records
+            expected: 0
+            actual:   0
+PASS  T-26  Loading from a folder with no data files
+            expected: 0 teams, 0 warnings
+            actual:   0 teams, 0 warnings
+PASS  T-26  A bad line is reported and skipped
+            expected: 1 warning, 3 teams loaded
+            actual:   1 warning, 3 teams loaded
+PASS  T-26  The warning names the file, line and field
+            expected: teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)
+            actual:   teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)
+
+== Manual test
+T-27  Letters typed where a number is expected: run the program and type letters at a menu prompt.
+      Evidence: docs/test-evidence/ (the prompt is repeated and the program keeps running).
+
+==================================================
+Summary: 83 passed, 0 failed, 83 checks
+ALL CHECKS PASSED
