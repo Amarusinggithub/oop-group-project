@@ -57,11 +57,11 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Enums: `TicketCategory`
 - [x] Shop rules: `Transaction.addItem` refuses a zero quantity and more than is in stock; abandoned sales can be cancelled
 - [x] Menus: `TicketMenu`, `ShopMenu`, `ReportMenu`
+- [x] Tests: `TestRunner` and `Check` (the runner and the PASS/FAIL printer)
+- [x] Tests: `TicketTests` (T-14 to T-16), proving `CapacityExceededException`
+- [x] Tests: `ShopTests` (T-21 to T-25), proving `InsufficientPaymentException` and `OutOfStockException`
 
 **To do**
-- [ ] Tests: `TestRunner` and `Check` (the runner and the PASS/FAIL printer)
-- [ ] Tests: `TicketTests` (T-14 to T-16), proving `CapacityExceededException`
-- [ ] Tests: `ShopTests` (T-21 to T-25), proving `InsufficientPaymentException` and `OutOfStockException`
 - [ ] Presentation slides (in progress)
 
 ## Activity log
@@ -83,3 +83,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Amar Campbell | Console: `Main` loads the data and opens `MainMenu` (ten areas, save, and save-on-exit); `InputHelper` checks every number, date, time and Y/N answer and shows numbered lists; `StadiumMenu` and `FixtureMenu`. | `Main.java`, `menu/MainMenu.java`, `menu/InputHelper.java`, `menu/StadiumMenu.java`, `menu/FixtureMenu.java` |
 | 2026-11-21 | Kemece Hinds | Menus: `TeamMenu` (register, update, search, display, approve or suspend), `PersonnelMenu` (players, goals and coaches), `OfficialMenu` (officials, assignment, inspection, commissioner) and `ResultsMenu` (results and standings). | `menu/TeamMenu.java`, `menu/PersonnelMenu.java`, `menu/OfficialMenu.java`, `menu/ResultsMenu.java` |
 | 2026-11-21 | Shenecia Williams | Menus: `TicketMenu` (sales with GCT by category, seats remaining), `ShopMenu` (products, sales with payment, change and receipt, stock written to `products.dat`) and `ReportMenu` (six reports RPT-01 to RPT-06 and searches SR-01 to SR-04). | `menu/TicketMenu.java`, `menu/ShopMenu.java`, `menu/ReportMenu.java` |
+| 2026-11-21 | Shenecia Williams | Tests: `TestRunner` and `Check` (PASS or FAIL with expected and actual), `TicketTests` (T-14 to T-16) and `ShopTests` (T-21 to T-25). | `tests/TestRunner.java`, `tests/Check.java`, `tests/TicketTests.java`, `tests/ShopTests.java` |
