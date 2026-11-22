@@ -26,9 +26,9 @@ Each member owns entity classes plus one or more parts of every other folder: en
 - [x] Persistence: `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
 - [x] Exception: `DataFileException`, thrown for a bad line in a data file
 - [x] Demo data in `data/`
+- [x] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
 
 **To do**
-- [ ] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
 - [ ] Tests: `FixtureTests` (T-08 to T-13)
 - [ ] Tests: `PersistenceTests` (T-26)
 - [ ] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
@@ -80,3 +80,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-21 | Kemece Hinds | Person hierarchy rules: validation in the `Person` setters; `Player.isEligible` (minimum age 16) and `addGoals`; `Coach.assignTeam` keeping the team's staff in step; `MatchOfficial.isAvailableFor` and `assignTo` with the clash check; the commissioner's `approveTeam`, `suspendTeam`, `inspectFixture` and `assignOfficial`. | `Person.java`, `Player.java`, `Coach.java`, `MatchOfficial.java`, `LeagueCommissioner.java` |
 | 2026-11-21 | Shenecia Williams | Shop rules: `Transaction.addItem` throws `InvalidDataException` for a quantity below 1 and `OutOfStockException` beyond the stock; added `removeItem`, `StadiumShop.cancelTransaction`, and restoring paid sales when data is loaded. | `Transaction.java`, `StadiumShop.java` |
 | 2026-11-21 | Amar Campbell | Persistence: `LeagueFileManager` saves the sequential `.txt` files through temporary files and loads them in ID order, skipping and reporting bad lines; `ProductFile` keeps every shop's products in fixed-length records in `products.dat` and rewrites one product's stock in place. `saveData` and `loadData` hand off to them. Added the demo league to `data/`. | `persistence/`, `data/` |
+| 2026-11-21 | Amar Campbell | Console: `Main` loads the data and opens `MainMenu` (ten areas, save, and save-on-exit); `InputHelper` checks every number, date, time and Y/N answer and shows numbered lists; `StadiumMenu` and `FixtureMenu`. | `Main.java`, `menu/MainMenu.java`, `menu/InputHelper.java`, `menu/StadiumMenu.java`, `menu/FixtureMenu.java` |
