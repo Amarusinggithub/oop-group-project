@@ -8,30 +8,35 @@
 
 package oop_project.entities;
 
+import oop_project.exceptions.ScheduleConflictException;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MatchOfficial extends Person {
     private String officiatingRole;
     private String rank;
-    private Boolean available;
+    private boolean available;
     private List<Fixture> assignedFixtures;
 
-    public MatchOfficial(String id, String name, int age, String gender, String officiatingRole, String rank, Boolean available) {
+    public MatchOfficial(String id, String name, int age, String gender, String officiatingRole, String rank, boolean available) {
         super(id, name, age, gender);
-        this.officiatingRole = officiatingRole;
-        this.rank = rank;
+        setOfficiatingRole(officiatingRole);
+        setRank(rank);
         this.available = available;
         this.assignedFixtures = new ArrayList<>();
     }
 
-    // Getters and setters for the new attributes
     public String getOfficiatingRole() {
         return officiatingRole;
     }
 
     public void setOfficiatingRole(String officiatingRole) {
-        this.officiatingRole = officiatingRole;
+        if (officiatingRole == null || officiatingRole.isBlank()) {
+            throw new IllegalArgumentException("Officiating role is required.");
+        }
+        this.officiatingRole = officiatingRole.trim();
     }
 
     public String getRank() {
@@ -39,23 +44,54 @@ public class MatchOfficial extends Person {
     }
 
     public void setRank(String rank) {
-        this.rank = rank;
+        if (rank == null || rank.isBlank()) {
+            throw new IllegalArgumentException("Rank is required.");
+        }
+        this.rank = rank.trim();
     }
 
-    public Boolean getAvailable() {
+    public boolean isAvailable() {
         return available;
     }
 
-    public void setAvailable(Boolean available) {
+    public void setAvailable(boolean available) {
         this.available = available;
     }
 
     public List<Fixture> getAssignedFixtures() {
-        return assignedFixtures;
+        return Collections.unmodifiableList(assignedFixtures);
     }
 
-    public void setAssignedFixtures(List<Fixture> assignedFixtures) {
-        this.assignedFixtures = assignedFixtures;
+    // True when the official is available and has no other fixture at the same date and time
+    public boolean isAvailableFor(Fixture fixture) {
+        if (!available) {
+            return false;
+        }
+        for (Fixture other : assignedFixtures) {
+            if (other.clashesWith(fixture)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Called by Fixture.assignOfficial; use that rather than calling this directly
+    void assignTo(Fixture fixture) throws ScheduleConflictException {
+        if (!available) {
+            throw new ScheduleConflictException(name + " is not available to officiate.");
+        }
+        // SRS rule: a match official cannot be assigned to conflicting fixtures
+        for (Fixture other : assignedFixtures) {
+            if (other.clashesWith(fixture)) {
+                throw new ScheduleConflictException(name + " is already officiating " + other + ".");
+            }
+        }
+        assignedFixtures.add(fixture);
+    }
+
+    // Called by Fixture.restore when saved data is loaded; the assignment was checked when it was first made
+    void restoreAssignment(Fixture fixture) {
+        assignedFixtures.add(fixture);
     }
 
     @Override
@@ -65,7 +101,13 @@ public class MatchOfficial extends Person {
 
     @Override
     public String displayInfo() {
-        return super.displayInfo() + ", Officiating Role: " + officiatingRole + ", Rank: " + rank + ", Available: " + available;
+        return super.displayInfo() + ", Officiating Role: " + officiatingRole + ", Rank: " + rank + ", Available: " + (available ? "Yes" : "No")
+                + ", Fixtures: " + assignedFixtures.size();
+    }
+
+    @Override
+    public String toFileRecord() {
+        return super.toFileRecord() + "," + officiatingRole + "," + rank + "," + available;
     }
 
 }

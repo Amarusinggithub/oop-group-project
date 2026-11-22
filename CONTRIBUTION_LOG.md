@@ -39,13 +39,12 @@ Each member owns entity classes plus one or more parts of every other folder: en
 ### Kemece Hinds (2501990)
 
 **Completed**
-- _None recorded yet_
+- [x] Person hierarchy (blue in the UML diagram, plus `Person`): `Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`
+- [x] Enums: `PlayerStatus`
+- [x] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
+- [x] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
 
 **To do**
-- [ ] Person hierarchy (blue in the UML diagram, plus `Person`): `Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`
-- [ ] Enums: `PlayerStatus`
-- [ ] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
-- [ ] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
 - [ ] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
 - [ ] Tests: `TeamTests` (T-01 to T-07)
 - [ ] Tests: `ResultTests` (T-17 to T-20, T-28)
@@ -78,3 +77,4 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-15 | Amar Campbell | Assigned the enum, exception, menu and test work to each member, and took persistence | `CONTRIBUTION_LOG.md` |
 | 2026-11-15 | Amar Campbell | Added a reference SRS generated with Claude (AI) to guide Kemece's own SRS. It is not Kemece's work and not the group's final SRS. | `docs/KPFL_SRS_AI_Reference.pdf` |
 | 2026-11-21 | Amar Campbell | League classes: wrote `FootballTeam` (squad and coaching staff, squad-size, minimum-age and jersey rules, match record and points) and `Fixture` (scheduled/completed/cancelled lifecycle, eligibility check, clashes, officials, ticket sales within capacity, results). Added lookups, spectators, reschedule and cancel, and separate standings, fixtures and shop-sales reports to `FootballLeague`. Finished `DataFileException`. | `FootballTeam.java`, `Fixture.java`, `FootballLeague.java`, `DataFileException.java` |
+| 2026-11-21 | Kemece Hinds | Person hierarchy rules: validation in the `Person` setters; `Player.isEligible` (minimum age 16) and `addGoals`; `Coach.assignTeam` keeping the team's staff in step; `MatchOfficial.isAvailableFor` and `assignTo` with the clash check; the commissioner's `approveTeam`, `suspendTeam`, `inspectFixture` and `assignOfficial`. | `Person.java`, `Player.java`, `Coach.java`, `MatchOfficial.java`, `LeagueCommissioner.java` |
