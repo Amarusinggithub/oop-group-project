@@ -29,12 +29,27 @@ These are the brief's core requirements. The system should:
 - produce at least three management reports
 - handle invalid data and prohibited operations with exceptions
 
+## Open it in Eclipse
+
+1. On GitHub, choose **Code > Download ZIP**, then **extract** the ZIP. Don't open it from inside the ZIP.
+2. In Eclipse, choose **File > Import > General > Existing Projects into Workspace**, then **Next**.
+3. Choose **Select root directory**, browse to the extracted folder (the one that contains `src`), tick `oop-group-project` and choose **Finish**.
+4. Right-click `Run KPFL.launch` in the Package Explorer and choose **Run As > Run KPFL**. You can also open `src/oop_project/Main.java` and choose **Run As > Java Application**.
+5. Click in the **Console** view at the bottom and type menu numbers there.
+
+To run the tests, use `Run Tests.launch`, or run `src/oop_project/tests/TestRunner.java` as a Java application.
+
+**If something goes wrong**
+- *No projects are found to import*: you picked the wrong folder. Pick the one that directly contains `src` and `.project`.
+- *Unbound JRE or red errors everywhere*: right-click the project, choose **Build Path > Configure Build Path > Libraries**, remove the JRE, then **Add Library > JRE System Library > Workspace default**.
+- *"No data folder... starting with an empty league"*: in **Run > Run Configurations > Arguments**, set the working directory to **Default**.
+
 ## Requirements
 
-- JDK 21
-- There is no build tool (no Maven or Gradle). The project is a plain IntelliJ module, and `src/` is its only source root.
+- Any JDK from version 8 up. The group develops on JDK 21.
+- There is no build tool (no Maven or Gradle). `src/` is the only source root.
 
-## Build and run
+## Build and run from the command line
 
 From the repo root, in Git Bash:
 
@@ -46,7 +61,7 @@ javac --release 21 -d out $(find src -name '*.java')
 java -cp out oop_project.Main
 ```
 
-You can also open the folder in IntelliJ IDEA and run `oop_project.Main`. Build output goes to `out/`, which git ignores.
+You can also open the folder in IntelliJ IDEA and run `oop_project.Main`. Build output goes to `out/` (or `bin/` in Eclipse), which git ignores.
 
 The program loads the sample league from `data/` at start-up, and writes it back when you choose **Save data** or save on exit. To use a different folder, pass its path as the first argument. The [user guide](docs/User_Guide.md) explains every menu option.
 

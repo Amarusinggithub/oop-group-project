@@ -42,6 +42,16 @@ There is no build tool (no Maven or Gradle). It is a plain IntelliJ module:
 - The language level is JDK 21.
 - Output goes to `out/`, which is gitignored.
 
+It is also an Eclipse project, because the group downloads the GitHub ZIP and imports it into Eclipse. Keep `.project`, `.classpath`, `.settings/` and the two `.launch` files in git. `.classpath` uses the workspace's default JRE on purpose, so members with different Java versions can open it.
+
+**Keep the code simple.** Every member has to explain the code in an interview, so it must compile with `javac --release 8` and must not use:
+- lambdas, method references, streams, `Comparator` or functional interfaces
+- generic methods, varargs, `var`, records or nested classes
+- arrow `switch`, pattern-matching `instanceof`, text blocks, the ternary operator or multi-catch
+- `java.nio.file`: use `File`, `BufferedReader`, `BufferedWriter` and `RandomAccessFile`
+
+Use plain loops, `if`/`else`, `switch`/`case`/`break` and separate `catch` blocks. Sorting uses a bubble sort.
+
 The group decided against Maven and Gradle: keep this layout and don't add a build tool.
 
 From the repo root, in Git Bash:
@@ -137,10 +147,10 @@ Collection getters return `Collections.unmodifiableList`, so mutate only through
 
 ### Persistence
 
-- `LeagueFileManager` writes each `.txt` file through a `.tmp` file, then moves it over the old one. On load, a bad line throws `DataFileException`; the loader reports it, skips it and keeps going.
+- `LeagueFileManager` writes each `.txt` file through a `.tmp` file, then deletes the old file and renames the new one. On load, a bad line throws `DataFileException`; the loader reports it, skips it and keeps going.
 - Files load in ID-dependency order: stadiums, teams, commissioner, players, coaches, officials, fixtures, tickets, products, then transactions. Spectators are rebuilt from tickets and transactions.
-- Team statistics aren't saved. `Fixture.restore` replays each completed result into both teams' records.
-- `Fixture.restore`, `Fixture.restoreTicket`, `StadiumShop.restoreTransaction` and `FootballLeague.restoreFixture` rebuild saved objects without re-checking rules. Only the loader calls them.
+- Team statistics aren't saved. `Fixture.restoreState` replays each completed result into both teams' records.
+- `Fixture.restoreState`, `Fixture.restoreTicket`, `StadiumShop.restoreTransaction` and `FootballLeague.restoreFixture` rebuild saved objects without re-checking rules. Only the loader calls them.
 - `ProductFile` holds fixed-length 243-byte records. `ShopMenu` calls `updateStock` after each paid sale.
 - `data/` is the committed demo league, generated through the real classes. Its people are fictional. Don't use real people's names in test or demo data.
 
@@ -151,7 +161,7 @@ Collection getters return `Collections.unmodifiableList`, so mutate only through
 - IDs are generated:
   - fixtures: `FX001`
   - tickets: `<fixtureId>-T0001`
-  - transactions: `<shopId>-TX0001`, numbered from the highest existing number. An abandoned sale is removed with `StadiumShop.cancelTransaction`.
+  - transactions: `<shopId>-TX0001`, using the next unused number. An abandoned sale is removed with `StadiumShop.cancelTransaction`.
 
 ### Money
 
@@ -177,7 +187,7 @@ Collection getters return `Collections.unmodifiableList`, so mutate only through
 
 ## UML diagram
 
-The class diagram is `docs/KPFL_UML_Class_Diagram.drawio`. Update it when entity fields or methods change. `docs/KPFL_UML_Class_Diagram.png` is an export of it, last updated 2026-11-21.
+The class diagram is `docs/KPFL_UML_Class_Diagram.drawio`. Update it when entity fields or methods change. `docs/KPFL_UML_Class_Diagram.png` is an export of it, last updated 2026-11-25.
 
 The user agreed on these notation rules:
 - Attributes and parameters are written `name: Type`, and lists as `List<Type>`.

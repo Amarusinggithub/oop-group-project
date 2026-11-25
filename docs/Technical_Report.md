@@ -4,7 +4,7 @@
 
 ## 1. Overview
 
-The system is a Java 21 console application for the Kingston Premier Football League. It manages:
+The system is a Java console application for the Kingston Premier Football League. It manages:
 - teams, players, coaches, the league commissioner and match officials
 - stadiums and fixtures, with clash checks
 - results and standings
@@ -14,7 +14,7 @@ The system is a Java 21 console application for the Kingston Premier Football Le
 
 All data is saved to files and loaded again at start-up.
 
-The code is plain Java with no external libraries and no build tool. `src/` is the only source root.
+The code is plain Java with no external libraries and no build tool. It compiles on any JDK from version 8, and opens as an Eclipse project. `src/` is the only source root.
 
 ## 2. Architecture
 
@@ -22,7 +22,7 @@ The code is split into six packages under `oop_project`. Dependencies point one 
 
 | Package | Contents | Depends on |
 |---|---|---|
-| `entities` (+ `entities.interfaces`) | The 18 domain classes and the `Taxable` interface. They hold the data and enforce the business rules. They never read input or print. | `enums`, `exceptions`; `FootballLeague` hands saving and loading to `persistence` |
+| `entities` (+ `entities.interfaces`) | The 17 domain classes and the `Taxable` interface. They hold the data and enforce the business rules. They never read input or print. | `enums`, `exceptions`; `FootballLeague` hands saving and loading to `persistence` |
 | `enums` | `TeamStatus`, `PlayerStatus`, `FixtureStatus`, `TicketCategory`, `FieldCondition` | nothing |
 | `exceptions` | `LeagueException` and its 7 business-rule subclasses, plus `DataFileException` | nothing |
 | `persistence` | `LeagueFileManager` (sequential text files) and `ProductFile` (random-access file) | `entities` |
@@ -39,17 +39,17 @@ The UML class diagram (`docs/KPFL_UML_Class_Diagram.drawio`) shows every class, 
 2. **Constructors and setters** reject impossible values, such as a blank name, a capacity below 1 or a negative price, with `IllegalArgumentException`.
 3. **Business operations** enforce the league rules with checked exceptions that extend `LeagueException`.
 
-Each menu catches `LeagueException`, `IllegalArgumentException` and `IllegalStateException` in one place, prints the message and returns to the same menu. `MainMenu` adds a final safety net, so no input can end the program.
+Each menu catches `LeagueException` and `RuntimeException` (which covers `IllegalArgumentException` and `IllegalStateException`) in one place, prints the message and returns to the same menu. `MainMenu` adds a final safety net, so no input can end the program.
 
 ## 3. How the OOP features are used
 
 | Feature | Where |
 |---|---|
 | Encapsulation | Every field is private, or protected in the abstract superclasses `Person` and `Product`. Setters validate. Collection getters return `Collections.unmodifiableList`, so a team's squad can only change through `addPlayer` and `removePlayer`, which apply the rules. |
-| Inheritance | `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial` and `Spectator` extend `Person`. `Merchandise` and `FoodItem` extend `Product`. All exceptions extend `LeagueException`. |
+| Inheritance | `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial` and `Spectator` extend `Person`. `Merchandise` and `FoodItem` extend `Product`. The seven business-rule exceptions extend `LeagueException`. |
 | Abstraction | `Person` and `Product` are abstract. `Taxable` is an interface implemented by `Tickets` and `Product`. |
-| Polymorphism | `getRole()`, `displayInfo()` and `toFileRecord()` are overridden in each `Person` subclass, and `LeagueFileManager` calls `toFileRecord()` through `Person` references to write people. `getCategory()` is overridden in each `Product` subclass. `getPriceWithTax()` is called the same way on tickets and products through `Taxable`. `ProductFile` writes a different record tail for each product subclass. |
-| Composition | `Stadium` creates its own `StadiumShop` in its constructor. A `Fixture` creates its `MatchResult` and `Tickets`. `StadiumShop` creates each `Transaction`. |
+| Polymorphism | `getRole()`, `displayInfo()` and `toFileRecord()` are overridden in each `Person` subclass, and `LeagueFileManager.personRecord(Person)` calls `toFileRecord()` through a `Person` reference for every kind of person. `getCategory()` is overridden in each `Product` subclass. `InputHelper.priceWithTax(Taxable)` prices both tickets and products through the interface. |
+| Composition | `Stadium` creates its own `StadiumShop` in its constructor. A `Fixture` creates its `MatchResult` and `Tickets` during the season. `StadiumShop` creates each `Transaction`. |
 | Aggregation | A `FootballTeam` holds `Player` and `Coach` objects that exist on their own (a coach can move teams). `FootballLeague` holds teams, stadiums, officials and spectators. A shop holds products. |
 | Association | A `Fixture` refers to two teams, a stadium and its officials. A `Spectator` refers to their tickets and purchases. |
 
@@ -71,7 +71,7 @@ The low-level methods on the other side are package-private (`~` in the UML), so
 
 | ID | Rule | Enforced in | Exception | Tests |
 |---|---|---|---|---|
-| BR-01 | An unregistered or suspended team cannot be assigned to a fixture | `Fixture` constructor | `TeamNotEligibleException` | T-08 |
+| BR-01 | An unregistered or suspended team cannot be assigned to a fixture | `FootballLeague.createFixture` | `TeamNotEligibleException` | T-08 |
 | BR-02 | A team cannot play two fixtures at the same date and time | `FootballLeague.createFixture`, `rescheduleFixture` | `ScheduleConflictException` | T-10, T-11 |
 | BR-03 | A match official cannot be assigned to clashing fixtures | `MatchOfficial.assignTo`, `FootballLeague.rescheduleFixture` | `ScheduleConflictException` | T-13 |
 | BR-04 | Ticket sales cannot exceed seating capacity | `Fixture.sellTicket` | `CapacityExceededException` | T-14, T-15 |
@@ -116,11 +116,11 @@ Spectators have no file of their own. They are rebuilt from the holder and custo
 
 ### 5.2 Saving and loading safely
 
-- **Saving through a temporary file.** `LeagueFileManager` writes each file as `name.tmp`, then moves it over the real file, atomically where the file system allows. An error part-way through a save leaves the previous data intact.
-- **Bad lines.** Each line is parsed through a small `Line` helper. It throws `DataFileException` naming the file, line and field, for example `teams.txt line 4: maximum squad size "abc" is not a whole number`. A line that breaks a business rule is treated the same way. The loader reports the line, skips it and carries on, so one bad line never loses the rest of the file.
+- **Saving through a temporary file.** `LeagueFileManager` writes each file as `name.tmp`, then deletes the old file and renames the new one to take its place. An error while a file is being written leaves the old file untouched.
+- **Bad lines.** Each line is split at its commas, and helper methods convert the numbers. A bad value throws `DataFileException`, and the loader adds the file and line number, for example `teams.txt line 4: maximum squad size "abc" is not a whole number`. A line that breaks a business rule is treated the same way. The loader reports the line, skips it and carries on, so one bad line never loses the rest of the file.
 - **Missing files.** A missing file means "no records yet".
-- **Restoring saved objects.** Saved objects are rebuilt without re-running the checks that only apply when something first happens. For example, a completed fixture whose team has since been suspended must still load. `Fixture.restore`, `Fixture.restoreTicket`, `StadiumShop.restoreTransaction` and `FootballLeague.restoreFixture` exist only for this, and the menus never call them.
-- **Standings.** Team statistics are not stored. `Fixture.restore` replays each completed fixture's result into both teams' records, so the standings always match the saved results.
+- **Restoring saved objects.** Saved objects are rebuilt without re-running the checks that only apply when something first happens. For example, a completed fixture whose team has since been suspended must still load. `Fixture.restoreState`, `Fixture.restoreTicket`, `StadiumShop.restoreTransaction` and `FootballLeague.restoreFixture` exist only for this, and the menus never call them.
+- **Standings.** Team statistics are not stored. `Fixture.restoreState` replays each completed fixture's result into both teams' records, so the standings always match the saved results.
 
 ### 5.3 The random-access product file
 
@@ -142,7 +142,7 @@ Spectators have no file of their own. They are rebuilt from the holder and custo
 
 Strings are padded to their fixed length. Because every record is the same size, record *n* starts at byte *n* × 243.
 
-After each paid sale, `ShopMenu` calls `ProductFile.updateStock`. It finds the product's record, seeks to the quantity field and overwrites those 4 bytes in place, without rewriting the file. The menus limit text input to the field sizes, and `ProductFile` refuses to truncate a longer value.
+After each paid sale, `ShopMenu` calls `ProductFile.updateStock`. It finds the product's record with a linear search, seeks to the quantity field and overwrites those 4 bytes in place, without rewriting the file. The menus limit text input to the field sizes, and `ProductFile` refuses to truncate a longer value.
 
 ## 6. User interface
 
@@ -187,6 +187,15 @@ T-27 (letters typed where a number is expected) is manual, using the console. It
 | `DataFileException` is unchecked and not a `LeagueException` | It reports bad file contents, not a league rule. The loader handles it in one place. |
 | `FootballLeague.saveData` and `loadData` take the data folder and hand off to `LeagueFileManager` | They stay in the UML as the league's own operations, while the file code stays in `persistence`. |
 | Additional rules BR-09 to BR-11 | A stadium cannot host two fixtures at once, a squad has a size limit, and a product cannot be sold beyond its stock. |
+
+### 8.1 Keeping the code simple
+
+The group chose basic Java throughout, so that every member can read and explain any class:
+- plain `for` and `while` loops instead of streams and lambdas
+- a bubble sort for the standings, the fixture list, the top scorers and the squad list. The lists are short, so its speed doesn't matter.
+- `switch` with `case` and `break` for every menu
+- `BufferedReader`, `BufferedWriter` and `RandomAccessFile` for the files
+- one `pick` method in `InputHelper` for each kind of object, instead of one generic method
 
 ## 9. Limitations and possible extensions
 

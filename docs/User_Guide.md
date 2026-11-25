@@ -6,11 +6,15 @@ This guide explains how to build, start and use the Kingston Premier Football Le
 
 ## 1. What you need
 
-- Java Development Kit (JDK) 21 or newer.
+- Eclipse, or any Java Development Kit (JDK) from version 8 up.
 - The project folder, including the `data` folder with the sample league.
 - No internet connection, database or extra library is needed.
 
 ## 2. Building and starting the program
+
+**In Eclipse:** extract the ZIP, choose **File > Import > General > Existing Projects into Workspace**, and select the extracted folder. Then right-click `Run KPFL.launch` and choose **Run As > Run KPFL**. Type in the **Console** view. The README has more detail, and fixes for common problems.
+
+**From the command line:**
 
 From the project folder, in Git Bash (or any shell with `find`):
 
@@ -25,7 +29,7 @@ When it starts, the program loads the league from `data/` and reports what it lo
 
 ```
 KPFL League and Match-Day Management System
-Loaded 8 teams, 4 stadiums, 9 officials and 19 fixtures from ...\data.
+Loaded 8 teams, 4 stadiums, 9 officials and 19 fixtures from data.
 ```
 
 If a line in a data file cannot be read, it is listed and skipped, and everything else still loads. If there is no `data` folder, the program starts with an empty league.
