@@ -1,6 +1,6 @@
 # KPFL League and Match-Day Management System: Technical Report
 
-> Draft for the group to review and complete. Export it to `docs/Technical_Report.pdf` for the submission. Section 10 must list sources and any AI assistance, as the course policy requires (brief, section 14).
+> Draft for the group to review and complete. Export it to `docs/Technical_Report.pdf` for the submission. Check section 10 against the course policy on sources and AI assistance (brief, section 14).
 
 ## 1. Overview
 
@@ -212,4 +212,6 @@ The group chose basic Java throughout, so that every member can read and explain
 
 - Project brief: *Jamaican Football League and Match-Day Management System, Six-Week Group Project Specification*, Rorron A. Clarke.
 - `docs/KPFL_SRS_AI_Reference.pdf`: an AI-generated reference SRS used as a guide for the group's own SRS.
-- _Group to complete: other sources and any AI assistance used, as the course policy requires._
+- _Group to complete: any other sources used._
+
+
