@@ -26,7 +26,7 @@ public class Coach extends Person {
     }
 
     public void setQualification(String qualification) {
-        if (qualification == null || qualification.isBlank()) {
+        if (qualification == null || qualification.trim().isEmpty()) {
             throw new IllegalArgumentException("Qualification is required.");
         }
         this.qualification = qualification.trim();
@@ -37,7 +37,7 @@ public class Coach extends Person {
     }
 
     public void setCoachingRole(String coachingRole) {
-        if (coachingRole == null || coachingRole.isBlank()) {
+        if (coachingRole == null || coachingRole.trim().isEmpty()) {
             throw new IllegalArgumentException("Coaching role is required.");
         }
         this.coachingRole = coachingRole.trim();
@@ -64,14 +64,21 @@ public class Coach extends Person {
 
     @Override
     public String displayInfo() {
-        return super.displayInfo() + ", Qualification: " + qualification + ", Coaching Role: " + coachingRole
-                + ", Team: " + (team == null ? "None" : team.getName());
+        String teamName = "None";
+        if (team != null) {
+            teamName = team.getName();
+        }
+        return super.displayInfo() + ", Qualification: " + qualification + ", Coaching Role: " + coachingRole + ", Team: " + teamName;
     }
 
     // The team is stored by registration number, or "-" when the coach has no team
     @Override
     public String toFileRecord(){
-        return super.toFileRecord() + "," + qualification + "," + coachingRole + "," + (team == null ? "-" : team.getRegistrationNo());
+        String teamNo = "-";
+        if (team != null) {
+            teamNo = team.getRegistrationNo();
+        }
+        return super.toFileRecord() + "," + qualification + "," + coachingRole + "," + teamNo;
     }
 
     @Override

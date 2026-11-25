@@ -29,90 +29,81 @@ import oop_project.enums.TicketCategory;
 import oop_project.persistence.LeagueFileManager;
 import oop_project.persistence.ProductFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class PersistenceTests {
 
-    public static void run() {
-        Path first = null;
-        Path second = null;
-        Path empty = null;
-        try {
-            first = Files.createTempDirectory("kpfl-save-1-");
-            second = Files.createTempDirectory("kpfl-save-2-");
-            empty = Files.createTempDirectory("kpfl-empty-");
-            runChecks(first, second, empty);
-        } catch (Exception e) {
-            Check.equal("T-26", "Run the persistence tests", "no error", e.getClass().getSimpleName() + ": " + e.getMessage());
-        } finally {
-            deleteFolder(first);
-            deleteFolder(second);
-            deleteFolder(empty);
-        }
-    }
+    public static void run() throws Exception {
+        String tempFolder = System.getProperty("java.io.tmpdir");
+        File first = new File(tempFolder, "kpfl-test-save-1");
+        File second = new File(tempFolder, "kpfl-test-save-2");
+        File missing = new File(tempFolder, "kpfl-test-no-such-folder");
+        deleteFolder(first);
+        deleteFolder(second);
 
-    private static void runChecks(Path first, Path second, Path empty) throws Exception {
         FootballLeague original = buildSampleLeague();
-        int saved = original.saveData(first);
+        int saved = original.saveData(first.getPath());
 
         FootballLeague reloaded = new FootballLeague("Test League", 2026);
-        List<String> warnings = reloaded.loadData(first);
-        Check.equal("T-26", "Save, restart and load: lines skipped", "[]", warnings.toString());
+        List<String> warnings = reloaded.loadData(first.getPath());
+        Check.equal("T-26", "Save, restart and load: lines skipped", "[]", warnings);
         Check.equal("T-26", "Record counts after reloading", describe(original), describe(reloaded));
         Check.equal("T-26", "Standings after reloading", standings(original), standings(reloaded));
         Check.money("T-26", "Shop sales after reloading", original.getStadiums().get(0).getShop().getTotalSales(),
                 reloaded.getStadiums().get(0).getShop().getTotalSales());
 
-        // Saving the reloaded league must give byte-for-byte the same files
-        int savedAgain = reloaded.saveData(second);
+        // Saving the reloaded league must give exactly the same files
+        int savedAgain = reloaded.saveData(second.getPath());
         Check.equal("T-26", "Records saved the first and second time", saved, savedAgain);
+        String[] fileNames = {"stadiums.txt", "teams.txt", "commissioner.txt", "players.txt", "coaches.txt",
+                "officials.txt", "fixtures.txt", "tickets.txt", "products.dat", "transactions.txt"};
         List<String> different = new ArrayList<>();
-        for (String file : LeagueFileManager.ALL_FILES) {
-            if (!Arrays.equals(Files.readAllBytes(first.resolve(file)), Files.readAllBytes(second.resolve(file)))) {
-                different.add(file);
+        for (String fileName : fileNames) {
+            if (!sameContents(new File(first, fileName), new File(second, fileName))) {
+                different.add(fileName);
             }
         }
-        Check.equal("T-26", "Every record identical to before saving (files that differ)", "[]", different.toString());
+        Check.equal("T-26", "Every record identical to before saving (files that differ)", "[]", different);
 
         // Random access: one product's stock is rewritten in place
-        ProductFile productFile = new LeagueFileManager(first).getProductFile();
-        long sizeBefore = Files.size(productFile.getFile());
+        ProductFile productFile = new LeagueFileManager(first.getPath()).getProductFile();
+        long sizeBefore = productFile.getFile().length();
         Product jersey = original.findStadium("ST1").getShop().findProduct("M001");
         Transaction sale = original.findStadium("ST1").getShop().startTransaction(original.findSpectator("S01"));
         sale.addItem(jersey, 1);
-        sale.pay(10_000);
+        sale.pay(10000);
         boolean updated = productFile.updateStock("ST1", jersey);
         Check.equal("T-26", "products.dat stock updated in place after a sale", "true, " + jersey.getQuantityInStock(),
                 updated + ", " + productFile.readStock("ST1", "M001"));
-        Check.equal("T-26", "products.dat size unchanged by the in-place update", sizeBefore, Files.size(productFile.getFile()));
-        Check.equal("T-26", "products.dat holds whole fixed-length records", 0L, Files.size(productFile.getFile()) % ProductFile.RECORD_SIZE);
+        Check.equal("T-26", "products.dat size unchanged by the in-place update", sizeBefore, productFile.getFile().length());
+        Check.equal("T-26", "products.dat holds whole fixed-length records", 0, productFile.getFile().length() % ProductFile.RECORD_SIZE);
 
         // A missing data folder means no records yet
         FootballLeague fresh = new FootballLeague("Test League", 2026);
-        List<String> noWarnings = fresh.loadData(empty.resolve("no-such-folder"));
+        List<String> noWarnings = fresh.loadData(missing.getPath());
         Check.equal("T-26", "Loading from a folder with no data files", "0 teams, 0 warnings",
                 fresh.getTeams().size() + " teams, " + noWarnings.size() + " warnings");
 
         // A bad line is skipped and reported; the rest of the file still loads
-        Files.writeString(first.resolve(LeagueFileManager.TEAMS), "T99,Broken FC,Kingston,not-a-number,PENDING\n",
-                StandardOpenOption.APPEND);
+        FileWriter writer = new FileWriter(new File(first, "teams.txt"), true);
+        writer.write("T99,Broken FC,Kingston,not-a-number,PENDING");
+        writer.close();
         FootballLeague partly = new FootballLeague("Test League", 2026);
-        List<String> badLine = partly.loadData(first);
+        List<String> badLine = partly.loadData(first.getPath());
         Check.equal("T-26", "A bad line is reported and skipped", "1 warning, 3 teams loaded",
                 badLine.size() + " warning, " + partly.getTeams().size() + " teams loaded");
         Check.equal("T-26", "The warning names the file, line and field",
-                "teams.txt line 4: maximum squad size \"not-a-number\" is not a whole number (skipped)",
-                badLine.isEmpty() ? "none" : badLine.get(0));
+                "[teams.txt line 4: maximum squad size \"not-a-number\" is not a whole number (skipped)]", badLine);
+
+        deleteFolder(first);
+        deleteFolder(second);
     }
 
     // A small league with at least one record of every kind
@@ -168,7 +159,7 @@ public class PersistenceTests {
         Transaction sale = national.getShop().startTransaction(fan);
         sale.addItem(national.getShop().findProduct("M001"), 2);
         sale.addItem(national.getShop().findProduct("F001"), 3);
-        sale.pay(12_000);
+        sale.pay(12000);
         Transaction unpaid = national.getShop().startTransaction(otherFan);
         unpaid.addItem(national.getShop().findProduct("F002"), 1); // never paid, so it is not saved
         return league;
@@ -195,10 +186,14 @@ public class PersistenceTests {
                 }
             }
         }
+        String commissioner = "none";
+        if (league.getCommissioner() != null) {
+            commissioner = league.getCommissioner().getId();
+        }
         return String.format("%d stadiums, %d teams, %d players, %d coaches, %d officials, commissioner %s, %d fixtures, "
                         + "%d tickets, %d spectators, %d products, %d paid sales",
                 league.getStadiums().size(), league.getTeams().size(), players, coaches, league.getOfficials().size(),
-                league.getCommissioner() == null ? "none" : league.getCommissioner().getId(), league.getFixtures().size(),
+                commissioner, league.getFixtures().size(),
                 tickets, league.getSpectators().size(), products, paidSales);
     }
 
@@ -210,16 +205,36 @@ public class PersistenceTests {
         return rows.toString();
     }
 
-    private static void deleteFolder(Path folder) {
-        if (folder == null || !Files.exists(folder)) {
-            return;
+    // Compares two files one byte at a time
+    private static boolean sameContents(File a, File b) throws IOException {
+        if (a.length() != b.length()) {
+            return false;
         }
-        try (Stream<Path> paths = Files.walk(folder)) {
-            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
-                Files.deleteIfExists(path);
+        FileInputStream inputA = new FileInputStream(a);
+        FileInputStream inputB = new FileInputStream(b);
+        boolean same = true;
+        int byteA = inputA.read();
+        int byteB = inputB.read();
+        while (byteA != -1) {
+            if (byteA != byteB) {
+                same = false;
             }
-        } catch (IOException e) {
-            System.out.println("(could not delete temporary folder " + folder + ": " + e.getMessage() + ")");
+            byteA = inputA.read();
+            byteB = inputB.read();
         }
+        inputA.close();
+        inputB.close();
+        return same;
+    }
+
+    // Deletes the files in a test folder, then the folder itself
+    private static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                file.delete();
+            }
+        }
+        folder.delete();
     }
 }

@@ -12,9 +12,8 @@ import oop_project.entities.FootballLeague;
 import oop_project.menu.InputHelper;
 import oop_project.menu.MainMenu;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
 
@@ -23,18 +22,21 @@ public class Main {
     public static final int SEASON = 2026;
 
     public static void main(String[] args) {
-        Path dataFolder = Path.of(args.length > 0 ? args[0] : "data");
+        String dataFolder = "data";
+        if (args.length > 0) {
+            dataFolder = args[0];
+        }
         FootballLeague league = new FootballLeague(LEAGUE_NAME, SEASON);
 
         System.out.println("KPFL League and Match-Day Management System");
-        if (!Files.isDirectory(dataFolder)) {
-            System.out.println("No data folder at " + dataFolder.toAbsolutePath() + " yet: starting with an empty league.");
+        if (!new File(dataFolder).isDirectory()) {
+            System.out.println("No data folder at " + dataFolder + " yet: starting with an empty league.");
         } else {
             try {
                 List<String> warnings = league.loadData(dataFolder);
                 System.out.printf("Loaded %d teams, %d stadiums, %d officials and %d fixtures from %s.%n",
                         league.getTeams().size(), league.getStadiums().size(), league.getOfficials().size(),
-                        league.getFixtures().size(), dataFolder.toAbsolutePath());
+                        league.getFixtures().size(), dataFolder);
                 if (!warnings.isEmpty()) {
                     System.out.println(warnings.size() + " line(s) could not be read and were skipped:");
                     for (String warning : warnings) {

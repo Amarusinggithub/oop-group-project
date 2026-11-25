@@ -1,4 +1,4 @@
-KPFL test run - 2026-11-21 19:25
+KPFL test run - 2026-11-25 07:59
 Java 26.0.2.1
 
 == TeamTests (T-01 to T-07): teams, squads and the minimum age
@@ -259,8 +259,8 @@ PASS  T-26  A bad line is reported and skipped
             expected: 1 warning, 3 teams loaded
             actual:   1 warning, 3 teams loaded
 PASS  T-26  The warning names the file, line and field
-            expected: teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)
-            actual:   teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)
+            expected: [teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)]
+            actual:   [teams.txt line 4: maximum squad size "not-a-number" is not a whole number (skipped)]
 
 == Manual test
 T-27  Letters typed where a number is expected: run the program and type letters at a menu prompt.

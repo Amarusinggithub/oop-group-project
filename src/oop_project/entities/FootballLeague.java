@@ -17,12 +17,10 @@ import oop_project.exceptions.TeamNotEligibleException;
 import oop_project.persistence.LeagueFileManager;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class FootballLeague {
@@ -50,7 +48,7 @@ public class FootballLeague {
     }
 
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("League name is required.");
         }
         this.name = name;
@@ -269,6 +267,8 @@ public class FootballLeague {
         if (!stadiums.contains(stadium)) {
             throw new IllegalArgumentException(stadium.getName() + " is not registered in " + name + ".");
         }
+        checkEligible(home);
+        checkEligible(away);
         String fixtureId = String.format("FX%03d", fixtures.size() + 1);
         Fixture fixture = new Fixture(fixtureId, home, away, stadium, date, kickOff);
         checkForClashes(fixture, home, away, stadium, date, kickOff);
@@ -277,7 +277,15 @@ public class FootballLeague {
         return fixture;
     }
 
-    // Adds a fixture rebuilt from saved data (see Fixture.restore). Used by LeagueFileManager when loading.
+    // SRS rule: an unregistered or suspended team cannot be assigned to a fixture
+    private void checkEligible(FootballTeam team) throws TeamNotEligibleException {
+        if (!team.isEligible()) {
+            throw new TeamNotEligibleException(team.getName() + " is " + team.getStatus().getStatus().toLowerCase()
+                    + " and cannot be assigned to a fixture.");
+        }
+    }
+
+    // Adds a fixture read from the data file (see Fixture.restoreState). Used by LeagueFileManager when loading.
     public void restoreFixture(Fixture fixture) {
         if (findFixture(fixture.getFixtureId()) != null) {
             throw new IllegalArgumentException("Fixture " + fixture.getFixtureId() + " is already recorded.");
@@ -327,10 +335,11 @@ public class FootballLeague {
                 continue;
             }
             // SRS rule: a team cannot participate in two fixtures scheduled for the same day and time
-            for (FootballTeam team : new FootballTeam[]{home, away}) {
-                if (other.involves(team)) {
-                    throw new ScheduleConflictException(team.getName() + " already plays in " + other + ".");
-                }
+            if (other.involves(home)) {
+                throw new ScheduleConflictException(home.getName() + " already plays in " + other + ".");
+            }
+            if (other.involves(away)) {
+                throw new ScheduleConflictException(away.getName() + " already plays in " + other + ".");
             }
             // SRS rule: a stadium cannot host two fixtures at the same date and time
             if (other.getStadium() == stadium) {
@@ -351,21 +360,59 @@ public class FootballLeague {
         fixture.complete();
     }
 
-    // Ranked by points, then goal difference, then goals scored, then name
+    // Ranked by points, then goal difference, then goals scored, then name.
+    // Uses a bubble sort: neighbours in the wrong order are swapped until the list is in order.
     public List<FootballTeam> getStandings() {
         List<FootballTeam> standings = new ArrayList<>(teams);
-        standings.sort(Comparator.comparingInt(FootballTeam::getPoints).reversed()
-                .thenComparing(Comparator.comparingInt(FootballTeam::getGoalDifference).reversed())
-                .thenComparing(Comparator.comparingInt(FootballTeam::getGoalsFor).reversed())
-                .thenComparing(FootballTeam::getName, String.CASE_INSENSITIVE_ORDER));
+        for (int pass = 0; pass < standings.size() - 1; pass++) {
+            for (int i = 0; i < standings.size() - 1 - pass; i++) {
+                FootballTeam first = standings.get(i);
+                FootballTeam second = standings.get(i + 1);
+                if (ranksAbove(second, first)) {
+                    standings.set(i, second);
+                    standings.set(i + 1, first);
+                }
+            }
+        }
         return standings;
     }
 
-    // Fixtures in date and kick-off order
+    // True when team a should be above team b in the league table
+    private boolean ranksAbove(FootballTeam a, FootballTeam b) {
+        if (a.getPoints() != b.getPoints()) {
+            return a.getPoints() > b.getPoints();
+        }
+        if (a.getGoalDifference() != b.getGoalDifference()) {
+            return a.getGoalDifference() > b.getGoalDifference();
+        }
+        if (a.getGoalsFor() != b.getGoalsFor()) {
+            return a.getGoalsFor() > b.getGoalsFor();
+        }
+        return a.getName().compareToIgnoreCase(b.getName()) < 0;
+    }
+
+    // Fixtures in date and kick-off order (bubble sort)
     public List<Fixture> getFixturesByDate() {
         List<Fixture> sorted = new ArrayList<>(fixtures);
-        sorted.sort(Comparator.comparing(Fixture::getDate).thenComparing(Fixture::getKickOff).thenComparing(Fixture::getFixtureId));
+        for (int pass = 0; pass < sorted.size() - 1; pass++) {
+            for (int i = 0; i < sorted.size() - 1 - pass; i++) {
+                Fixture first = sorted.get(i);
+                Fixture second = sorted.get(i + 1);
+                if (isEarlier(second, first)) {
+                    sorted.set(i, second);
+                    sorted.set(i + 1, first);
+                }
+            }
+        }
         return sorted;
+    }
+
+    // True when fixture a kicks off before fixture b
+    private boolean isEarlier(Fixture a, Fixture b) {
+        if (!a.getDate().equals(b.getDate())) {
+            return a.getDate().isBefore(b.getDate());
+        }
+        return a.getKickOff().isBefore(b.getKickOff());
     }
 
     // RPT-01: the league table
@@ -395,8 +442,10 @@ public class FootballLeague {
         report.append(String.format("%-6s %-10s %-5s %-20s %-20s %-32s %-12s %7s%n",
                 "ID", "Date", "Time", "Home", "Away", "Stadium", "Result", "Tickets"));
         for (Fixture fixture : getFixturesByDate()) {
-            String outcome = fixture.getResult() == null || fixture.getStatus() != FixtureStatus.COMPLETED
-                    ? fixture.getStatus().getStatus() : fixture.getResult().getScoreLine();
+            String outcome = fixture.getStatus().getStatus();
+            if (fixture.getStatus() == FixtureStatus.COMPLETED) {
+                outcome = fixture.getResult().getScoreLine();
+            }
             report.append(String.format("%-6s %-10s %-5s %-20s %-20s %-32s %-12s %7d%n", fixture.getFixtureId(),
                     fixture.getDate(), fixture.getKickOff(), fixture.getHomeTeam().getName(), fixture.getAwayTeam().getName(),
                     fixture.getStadium().getName(), outcome, fixture.getTickets().size()));
@@ -412,11 +461,9 @@ public class FootballLeague {
         StringBuilder report = new StringBuilder();
         report.append("STADIUM SHOP SALES (incl. GCT)\n");
         report.append(String.format("%-34s %6s %14s%n", "Stadium", "Sales", "Total"));
-        List<Stadium> sorted = new ArrayList<>(stadiums);
-        sorted.sort(Comparator.comparing(Stadium::getName, String.CASE_INSENSITIVE_ORDER));
         double totalSales = 0;
         int totalCount = 0;
-        for (Stadium stadium : sorted) {
+        for (Stadium stadium : stadiums) {
             int count = 0;
             for (Transaction transaction : stadium.getShop().getTransactions()) {
                 if (transaction.isPaid()) {
@@ -438,13 +485,13 @@ public class FootballLeague {
     }
 
     // Writes every data file into the folder and returns the number of records saved
-    public int saveData(Path folder) throws IOException {
+    public int saveData(String folder) throws IOException {
         return new LeagueFileManager(folder).save(this);
     }
 
     // Loads the data files from the folder into this league, which must be empty.
     // Returns a message for each line that could not be read; those lines are skipped.
-    public List<String> loadData(Path folder) throws IOException {
+    public List<String> loadData(String folder) throws IOException {
         if (!teams.isEmpty() || !stadiums.isEmpty() || !officials.isEmpty() || !fixtures.isEmpty()) {
             throw new IllegalStateException("Data can only be loaded into an empty league.");
         }

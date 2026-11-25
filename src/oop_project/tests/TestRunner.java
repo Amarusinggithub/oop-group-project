@@ -1,8 +1,7 @@
 /**
  * Author: Shenecia Williams - 2501202
  * Date: 11/21/2026
- * Description: This class runs every test class in order and prints a summary. The program exits
- * with status 1 if any check failed, so a failing run is easy to spot. T-27 (letters typed where a
+ * Description: This class runs every test class in order and prints a summary. T-27 (letters typed where a
  * number is expected) is a manual console test; its evidence is in docs/test-evidence/.
  *
  * Run from the repo root:  java -cp out oop_project.tests.TestRunner
@@ -15,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 
 public class TestRunner {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("KPFL test run - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         System.out.println("Java " + System.getProperty("java.version"));
 
@@ -39,9 +38,10 @@ public class TestRunner {
         System.out.println("==================================================");
         System.out.printf("Summary: %d passed, %d failed, %d checks%n", Check.getPassed(), Check.getFailed(),
                 Check.getPassed() + Check.getFailed());
-        System.out.println(Check.getFailed() == 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED");
-        if (Check.getFailed() > 0) {
-            System.exit(1);
+        if (Check.getFailed() == 0) {
+            System.out.println("ALL CHECKS PASSED");
+        } else {
+            System.out.println("SOME CHECKS FAILED");
         }
     }
 

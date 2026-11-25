@@ -17,8 +17,8 @@ import oop_project.exceptions.LeagueException;
 public class TeamMenu {
     public static final int MAX_SQUAD_LIMIT = 50;
 
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public TeamMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -27,21 +27,35 @@ public class TeamMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Teams", "Back",
-                    "Register team", "Update team", "Search for a team", "Display all teams", "Approve or suspend a team");
+            String[] options = {"Register team", "Update team", "Search for a team", "Display all teams", "Approve or suspend a team"};
+            int choice = input.menu("Teams", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> registerTeam();
-                    case 2 -> updateTeam();
-                    case 3 -> searchTeam();
-                    case 4 -> displayTeams();
-                    case 5 -> approveOrSuspend();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        registerTeam();
+                        break;
+                    case 2:
+                        updateTeam();
+                        break;
+                    case 3:
+                        searchTeam();
+                        break;
+                    case 4:
+                        displayTeams();
+                        break;
+                    case 5:
+                        approveOrSuspend();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -59,7 +73,7 @@ public class TeamMenu {
     }
 
     private void updateTeam() {
-        FootballTeam team = input.pick("Teams", league.getTeams(), FixtureMenu::teamLabel);
+        FootballTeam team = input.pickTeam("Teams", league.getTeams());
         if (team == null) {
             return;
         }
@@ -119,11 +133,12 @@ public class TeamMenu {
             System.out.println("There is no league commissioner on record. Add one under Match officials > Set league commissioner.");
             return;
         }
-        FootballTeam team = input.pick("Teams", league.getTeams(), FixtureMenu::teamLabel);
+        FootballTeam team = input.pickTeam("Teams", league.getTeams());
         if (team == null) {
             return;
         }
-        int choice = input.menu("Commissioner " + commissioner.getName() + ": " + team.getName(), "Back", "Approve (Registered)", "Suspend");
+        String[] options = {"Approve (Registered)", "Suspend"};
+        int choice = input.menu("Commissioner " + commissioner.getName() + ": " + team.getName(), "Back", options);
         if (choice == 1) {
             commissioner.approveTeam(team);
         } else if (choice == 2) {

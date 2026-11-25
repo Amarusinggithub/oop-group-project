@@ -18,7 +18,7 @@ public abstract class Product implements Taxable {
     protected int quantityInStock;
 
     public Product(String productCode, String name, double basePrice, int quantityInStock) {
-        if (productCode == null || productCode.isBlank()) {
+        if (productCode == null || productCode.trim().isEmpty()) {
             throw new IllegalArgumentException("Product code is required.");
         }
         if (quantityInStock < 0) {
@@ -39,7 +39,7 @@ public abstract class Product implements Taxable {
     }
 
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Product name is required.");
         }
         this.name = name;

@@ -35,7 +35,7 @@ public class Player extends Person {
     }
 
     public void setPosition(String position) {
-        if (position == null || position.isBlank()) {
+        if (position == null || position.trim().isEmpty()) {
             throw new IllegalArgumentException("Position is required.");
         }
         this.position = position.trim();

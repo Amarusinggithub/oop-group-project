@@ -33,7 +33,7 @@ public class MatchOfficial extends Person {
     }
 
     public void setOfficiatingRole(String officiatingRole) {
-        if (officiatingRole == null || officiatingRole.isBlank()) {
+        if (officiatingRole == null || officiatingRole.trim().isEmpty()) {
             throw new IllegalArgumentException("Officiating role is required.");
         }
         this.officiatingRole = officiatingRole.trim();
@@ -44,7 +44,7 @@ public class MatchOfficial extends Person {
     }
 
     public void setRank(String rank) {
-        if (rank == null || rank.isBlank()) {
+        if (rank == null || rank.trim().isEmpty()) {
             throw new IllegalArgumentException("Rank is required.");
         }
         this.rank = rank.trim();
@@ -89,7 +89,7 @@ public class MatchOfficial extends Person {
         assignedFixtures.add(fixture);
     }
 
-    // Called by Fixture.restore when saved data is loaded; the assignment was checked when it was first made
+    // Called by Fixture.restoreState when saved data is loaded; the assignment was checked when it was first made
     void restoreAssignment(Fixture fixture) {
         assignedFixtures.add(fixture);
     }
@@ -101,8 +101,12 @@ public class MatchOfficial extends Person {
 
     @Override
     public String displayInfo() {
-        return super.displayInfo() + ", Officiating Role: " + officiatingRole + ", Rank: " + rank + ", Available: " + (available ? "Yes" : "No")
-                + ", Fixtures: " + assignedFixtures.size();
+        String availableText = "No";
+        if (available) {
+            availableText = "Yes";
+        }
+        return super.displayInfo() + ", Officiating Role: " + officiatingRole + ", Rank: " + rank
+                + ", Available: " + availableText + ", Fixtures: " + assignedFixtures.size();
     }
 
     @Override

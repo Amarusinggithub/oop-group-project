@@ -10,14 +10,13 @@ package oop_project.menu;
 import oop_project.entities.FootballLeague;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class MainMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
-    private final Path dataFolder;
+    private FootballLeague league;
+    private InputHelper input;
+    private String dataFolder;
 
-    public MainMenu(FootballLeague league, InputHelper input, Path dataFolder) {
+    public MainMenu(FootballLeague league, InputHelper input, String dataFolder) {
         this.league = league;
         this.input = input;
         this.dataFolder = dataFolder;
@@ -25,28 +24,50 @@ public class MainMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu(league.getName() + " - Season " + league.getSeason(), "Exit",
-                    "Teams", "Players & coaches", "Stadiums", "Fixtures", "Match officials",
-                    "Results & standings", "Ticket sales", "Stadium shop", "Reports & search", "Save data");
+            String[] options = {"Teams", "Players & coaches", "Stadiums", "Fixtures", "Match officials",
+                    "Results & standings", "Ticket sales", "Stadium shop", "Reports & search", "Save data"};
+            int choice = input.menu(league.getName() + " - Season " + league.getSeason(), "Exit", options);
             try {
                 switch (choice) {
-                    case 1 -> new TeamMenu(league, input).run();
-                    case 2 -> new PersonnelMenu(league, input).run();
-                    case 3 -> new StadiumMenu(league, input).run();
-                    case 4 -> new FixtureMenu(league, input).run();
-                    case 5 -> new OfficialMenu(league, input).run();
-                    case 6 -> new ResultsMenu(league, input).run();
-                    case 7 -> new TicketMenu(league, input).run();
-                    case 8 -> new ShopMenu(league, input, dataFolder).run();
-                    case 9 -> new ReportMenu(league, input).run();
-                    case 10 -> save();
-                    case 0 -> {
+                    case 1:
+                        new TeamMenu(league, input).run();
+                        break;
+                    case 2:
+                        new PersonnelMenu(league, input).run();
+                        break;
+                    case 3:
+                        new StadiumMenu(league, input).run();
+                        break;
+                    case 4:
+                        new FixtureMenu(league, input).run();
+                        break;
+                    case 5:
+                        new OfficialMenu(league, input).run();
+                        break;
+                    case 6:
+                        new ResultsMenu(league, input).run();
+                        break;
+                    case 7:
+                        new TicketMenu(league, input).run();
+                        break;
+                    case 8:
+                        new ShopMenu(league, input, dataFolder).run();
+                        break;
+                    case 9:
+                        new ReportMenu(league, input).run();
+                        break;
+                    case 10:
+                        save();
+                        break;
+                    case 0:
                         if (confirmExit()) {
                             System.out.println("Goodbye.");
                             return;
                         }
-                    }
-                    default -> System.out.println("Please choose an option from the menu.");
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
             } catch (RuntimeException e) {
                 // Each sub-menu handles its own errors; this is a last safety net so the program never crashes
@@ -67,10 +88,13 @@ public class MainMenu {
     private boolean save() {
         try {
             int records = league.saveData(dataFolder);
-            System.out.println("Saved " + records + " records to " + dataFolder.toAbsolutePath() + ".");
+            System.out.println("Saved " + records + " records to " + dataFolder + ".");
             return true;
-        } catch (IOException | RuntimeException e) {
-            System.out.println("Could not save the data: " + e.getMessage() + ". Your previous saved data is unchanged.");
+        } catch (IOException e) {
+            System.out.println("Could not save the data: " + e.getMessage());
+            return false;
+        } catch (RuntimeException e) {
+            System.out.println("Could not save the data: " + e.getMessage());
             return false;
         }
     }

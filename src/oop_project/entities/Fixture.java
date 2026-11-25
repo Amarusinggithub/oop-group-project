@@ -15,7 +15,6 @@ import oop_project.exceptions.CapacityExceededException;
 import oop_project.exceptions.InvalidDataException;
 import oop_project.exceptions.ResultNotRecordedException;
 import oop_project.exceptions.ScheduleConflictException;
-import oop_project.exceptions.TeamNotEligibleException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,15 +34,11 @@ public class Fixture {
     private List<Tickets> tickets;
     private MatchResult result;
 
-    // FootballLeague.createFixture creates fixtures, gives them their IDs and checks for clashes
+    // FootballLeague.createFixture creates fixtures, gives them their IDs, and checks that the
+    // teams are eligible and that nothing clashes
     public Fixture(String fixtureId, FootballTeam homeTeam, FootballTeam awayTeam, Stadium stadium,
-                   LocalDate date, LocalTime kickOff) throws TeamNotEligibleException {
-        this(fixtureId, homeTeam, awayTeam, stadium, date, kickOff, true);
-    }
-
-    private Fixture(String fixtureId, FootballTeam homeTeam, FootballTeam awayTeam, Stadium stadium,
-                    LocalDate date, LocalTime kickOff, boolean checkEligibility) throws TeamNotEligibleException {
-        if (fixtureId == null || fixtureId.isBlank()) {
+                   LocalDate date, LocalTime kickOff) {
+        if (fixtureId == null || fixtureId.trim().isEmpty()) {
             throw new IllegalArgumentException("Fixture ID is required.");
         }
         if (homeTeam == null || awayTeam == null) {
@@ -58,15 +53,6 @@ public class Fixture {
         if (date == null || kickOff == null) {
             throw new IllegalArgumentException("A fixture needs a date and a kick-off time.");
         }
-        if (checkEligibility) {
-            // SRS rule: an unregistered or suspended team cannot be assigned to a fixture
-            for (FootballTeam team : new FootballTeam[]{homeTeam, awayTeam}) {
-                if (!team.isEligible()) {
-                    throw new TeamNotEligibleException(team.getName() + " is " + team.getStatus().getStatus().toLowerCase()
-                            + " and cannot be assigned to a fixture.");
-                }
-            }
-        }
         this.fixtureId = fixtureId;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
@@ -78,32 +64,22 @@ public class Fixture {
         this.tickets = new ArrayList<>();
     }
 
-    // Rebuilds a fixture from saved data. The rules were checked when the fixture was first made,
-    // so the teams' current status is not checked again. A completed fixture's result is added to
-    // both teams' records, so the standings are rebuilt from the saved results.
-    // Used by LeagueFileManager when loading; menus use FootballLeague.createFixture instead.
-    public static Fixture restore(String fixtureId, FootballTeam homeTeam, FootballTeam awayTeam, Stadium stadium,
-                                  LocalDate date, LocalTime kickOff, FixtureStatus status,
-                                  List<MatchOfficial> officials, MatchResult result) {
-        Fixture fixture;
-        try {
-            fixture = new Fixture(fixtureId, homeTeam, awayTeam, stadium, date, kickOff, false);
-        } catch (TeamNotEligibleException e) {
-            throw new IllegalStateException(e); // cannot happen: eligibility is not checked here
-        }
-        if (status == FixtureStatus.COMPLETED && result == null) {
+    // Puts back the status, officials and result read from the data file. A completed fixture's
+    // result is added to both teams' records, so the standings are worked out from the saved results.
+    // Only LeagueFileManager calls this, when it loads the data.
+    public void restoreState(FixtureStatus savedStatus, List<MatchOfficial> savedOfficials, MatchResult savedResult) {
+        if (savedStatus == FixtureStatus.COMPLETED && savedResult == null) {
             throw new IllegalArgumentException("Completed fixture " + fixtureId + " has no result.");
         }
-        for (MatchOfficial official : officials) {
-            fixture.officials.add(official);
-            official.restoreAssignment(fixture);
+        for (MatchOfficial official : savedOfficials) {
+            officials.add(official);
+            official.restoreAssignment(this);
         }
-        fixture.result = result;
-        if (status == FixtureStatus.COMPLETED) {
-            fixture.updateTeamRecords();
+        result = savedResult;
+        if (savedStatus == FixtureStatus.COMPLETED) {
+            updateTeamRecords();
         }
-        fixture.status = status;
-        return fixture;
+        status = savedStatus;
     }
 
     public String getFixtureId() {
@@ -173,9 +149,13 @@ public class Fixture {
 
     // Two fixtures clash when both still count (neither is cancelled) and they share a date and kick-off time
     public boolean clashesWith(Fixture other) {
-        return other != null && other != this
-                && status != FixtureStatus.CANCELLED && other.status != FixtureStatus.CANCELLED
-                && date.equals(other.date) && kickOff.equals(other.kickOff);
+        if (other == null || other == this) {
+            return false;
+        }
+        if (status == FixtureStatus.CANCELLED || other.status == FixtureStatus.CANCELLED) {
+            return false;
+        }
+        return date.equals(other.date) && kickOff.equals(other.kickOff);
     }
 
     public boolean involves(FootballTeam team) {
@@ -223,7 +203,7 @@ public class Fixture {
     }
 
     public int getSeatsRemaining() {
-        return Math.max(0, stadium.getSeatingCapacity() - tickets.size());
+        return stadium.getSeatingCapacity() - tickets.size();
     }
 
     // Ticket revenue including GCT
@@ -246,7 +226,10 @@ public class Fixture {
         if (result == null || result.isDraw()) {
             return null;
         }
-        return result.isHomeWin() ? homeTeam : awayTeam;
+        if (result.isHomeWin()) {
+            return homeTeam;
+        }
+        return awayTeam;
     }
 
     public void complete() throws ResultNotRecordedException {
@@ -277,7 +260,10 @@ public class Fixture {
     }
 
     public String displayInfo() {
-        String outcome = result == null ? status.getStatus() : status.getStatus() + " " + result.getScoreLine();
+        String outcome = status.getStatus();
+        if (result != null) {
+            outcome = outcome + " " + result.getScoreLine();
+        }
         return fixtureId + ": " + this + " at " + stadium.getName() + " - " + outcome
                 + ", Officials: " + officials.size() + ", Tickets sold: " + tickets.size();
     }

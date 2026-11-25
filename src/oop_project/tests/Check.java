@@ -8,69 +8,54 @@
 
 package oop_project.tests;
 
-import java.util.Objects;
+public class Check {
+    private static int passed = 0;
+    private static int failed = 0;
 
-public final class Check {
-    private static int passed;
-    private static int failed;
-
-    private Check() {
-    }
-
-    // A piece of test code that may throw a checked exception
-    @FunctionalInterface
-    public interface Action {
-        void run() throws Exception;
-    }
-
-    // Passes when the actual value equals the expected one
+    // Passes when the two values are the same when written as text
     public static void equal(String id, String description, Object expected, Object actual) {
-        report(id, description, Objects.equals(expected, actual), String.valueOf(expected), String.valueOf(actual));
+        String expectedText = String.valueOf(expected);
+        String actualText = String.valueOf(actual);
+        report(id, description, expectedText.equals(actualText), expectedText, actualText);
     }
 
     // Passes when two amounts of money are the same to the cent
     public static void money(String id, String description, double expected, double actual) {
-        boolean same = Math.round(expected * 100) == Math.round(actual * 100);
-        report(id, description, same, String.format("$%,.2f", expected), String.format("$%,.2f", actual));
+        String expectedText = String.format("$%,.2f", expected);
+        String actualText = String.format("$%,.2f", actual);
+        report(id, description, expectedText.equals(actualText), expectedText, actualText);
     }
 
-    // Passes when the action throws the expected exception (or a subclass of it)
-    public static void throwsException(String id, String description, Class<? extends Throwable> expected, Action action) {
-        String actual;
-        boolean pass;
-        try {
-            action.run();
-            actual = "no exception";
-            pass = false;
-        } catch (Throwable e) {
-            actual = e.getClass().getSimpleName() + ": " + e.getMessage();
-            pass = expected.isInstance(e);
-        }
-        report(id, description, pass, expected.getSimpleName(), actual);
+    // Use in a catch block: passes when the exception caught is the expected one
+    public static void exception(String id, String description, String expected, Exception e) {
+        String name = e.getClass().getSimpleName();
+        report(id, description, name.equals(expected), expected, name + ": " + e.getMessage());
     }
 
-    // Passes when the action finishes without throwing
-    public static void noException(String id, String description, Action action) {
-        String actual;
-        boolean pass;
-        try {
-            action.run();
-            actual = "completed";
-            pass = true;
-        } catch (Throwable e) {
-            actual = e.getClass().getSimpleName() + ": " + e.getMessage();
-            pass = false;
-        }
-        report(id, description, pass, "completed", actual);
+    // Use after code that should have thrown an exception but did not
+    public static void notThrown(String id, String description, String expected) {
+        report(id, description, false, expected, "no exception");
+    }
+
+    // Use after code that should finish normally, and did
+    public static void completed(String id, String description) {
+        report(id, description, true, "completed", "completed");
+    }
+
+    // Use in a catch block when the code should have finished normally
+    public static void unexpected(String id, String description, Exception e) {
+        report(id, description, false, "completed", e.getClass().getSimpleName() + ": " + e.getMessage());
     }
 
     private static void report(String id, String description, boolean pass, String expected, String actual) {
+        String result = "FAIL";
         if (pass) {
+            result = "PASS";
             passed++;
         } else {
             failed++;
         }
-        System.out.printf("%s  %-5s %s%n", pass ? "PASS" : "FAIL", id, description);
+        System.out.printf("%s  %-5s %s%n", result, id, description);
         System.out.println("            expected: " + expected);
         System.out.println("            actual:   " + actual);
     }

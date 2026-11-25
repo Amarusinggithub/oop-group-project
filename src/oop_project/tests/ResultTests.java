@@ -14,9 +14,7 @@ import oop_project.entities.FootballTeam;
 import oop_project.entities.Stadium;
 import oop_project.enums.FixtureStatus;
 import oop_project.enums.TeamStatus;
-import oop_project.exceptions.InvalidDataException;
 import oop_project.exceptions.LeagueException;
-import oop_project.exceptions.ResultNotRecordedException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,7 +23,7 @@ import java.util.List;
 
 public class ResultTests {
 
-    public static void run() {
+    public static void run() throws LeagueException {
         FootballLeague league = new FootballLeague("Test League", 2026);
         FootballTeam harbourView = new FootballTeam("T1", "Harbour View", "Kingston", 25);
         FootballTeam waterhouse = new FootballTeam("T2", "Waterhouse", "Kingston", 25);
@@ -33,43 +31,64 @@ public class ResultTests {
         FootballTeam portmore = new FootballTeam("T4", "Portmore United", "St. Catherine", 25);
         Stadium stadium = new Stadium("ST1", "National Stadium", "Kingston", 35000, 1500);
         Stadium stadium2 = new Stadium("ST2", "Anthony Spaulding Sports Complex", "Kingston", 7000, 1000);
-        Fixture first;
-        Fixture second;
-        try {
-            for (FootballTeam team : new FootballTeam[]{harbourView, waterhouse, cavalier, portmore}) {
-                team.setStatus(TeamStatus.REGISTERED);
-                league.registerTeam(team);
-            }
-            league.registerStadium(stadium);
-            league.registerStadium(stadium2);
-            first = league.createFixture(harbourView, waterhouse, stadium, LocalDate.of(2026, 12, 5), LocalTime.of(15, 0));
-            second = league.createFixture(cavalier, portmore, stadium2, LocalDate.of(2026, 12, 5), LocalTime.of(15, 0));
-        } catch (LeagueException e) {
-            Check.equal("T-17", "Set up the result tests", "set up", e.getMessage());
-            return;
+        FootballTeam[] allTeams = {harbourView, waterhouse, cavalier, portmore};
+        for (FootballTeam team : allTeams) {
+            team.setStatus(TeamStatus.REGISTERED);
+            league.registerTeam(team);
         }
+        league.registerStadium(stadium);
+        league.registerStadium(stadium2);
+        Fixture first = league.createFixture(harbourView, waterhouse, stadium, LocalDate.of(2026, 12, 5), LocalTime.of(15, 0));
+        Fixture second = league.createFixture(cavalier, portmore, stadium2, LocalDate.of(2026, 12, 5), LocalTime.of(15, 0));
 
         // T-17 (invalid): completing a fixture before a result is recorded
-        Check.throwsException("T-17", "Complete a fixture with no result (invalid)", ResultNotRecordedException.class, first::complete);
+        try {
+            first.complete();
+            Check.notThrown("T-17", "Complete a fixture with no result (invalid)", "ResultNotRecordedException");
+        } catch (Exception e) {
+            Check.exception("T-17", "Complete a fixture with no result (invalid)", "ResultNotRecordedException", e);
+        }
         Check.equal("T-17", "Fixture is still scheduled", FixtureStatus.SCHEDULED, first.getStatus());
 
         // T-18 (invalid): a negative score
-        Check.throwsException("T-18", "Record a score of -1 to 0 (invalid)", InvalidDataException.class,
-                () -> league.recordResult(first, -1, 0));
+        try {
+            league.recordResult(first, -1, 0);
+            Check.notThrown("T-18", "Record a score of -1 to 0 (invalid)", "InvalidDataException");
+        } catch (Exception e) {
+            Check.exception("T-18", "Record a score of -1 to 0 (invalid)", "InvalidDataException", e);
+        }
+        String resultText = "no result";
+        if (first.getResult() != null) {
+            resultText = "has a result";
+        }
         Check.equal("T-18", "Fixture is still scheduled and has no result", "SCHEDULED, no result",
-                first.getStatus() + (first.getResult() == null ? ", no result" : ", has a result"));
+                first.getStatus() + ", " + resultText);
 
         // T-19 (normal): a home win
-        Check.noException("T-19", "Record 2-1 for the home team (normal)", () -> league.recordResult(first, 2, 1));
+        try {
+            league.recordResult(first, 2, 1);
+            Check.completed("T-19", "Record 2-1 for the home team (normal)");
+        } catch (Exception e) {
+            Check.unexpected("T-19", "Record 2-1 for the home team (normal)", e);
+        }
         Check.equal("T-19", "Home team points", 3, harbourView.getPoints());
         Check.equal("T-19", "Away team points", 0, waterhouse.getPoints());
         Check.equal("T-19", "Fixture status", FixtureStatus.COMPLETED, first.getStatus());
         Check.equal("T-19", "Winner", "Harbour View", String.valueOf(first.getWinner()));
-        Check.throwsException("T-19", "A completed fixture cannot be given another result", IllegalStateException.class,
-                () -> league.recordResult(first, 0, 0));
+        try {
+            league.recordResult(first, 0, 0);
+            Check.notThrown("T-19", "A completed fixture cannot be given another result", "IllegalStateException");
+        } catch (Exception e) {
+            Check.exception("T-19", "A completed fixture cannot be given another result", "IllegalStateException", e);
+        }
 
         // T-20 (normal): a draw
-        Check.noException("T-20", "Record 1-1 (normal)", () -> league.recordResult(second, 1, 1));
+        try {
+            league.recordResult(second, 1, 1);
+            Check.completed("T-20", "Record 1-1 (normal)");
+        } catch (Exception e) {
+            Check.unexpected("T-20", "Record 1-1 (normal)", e);
+        }
         Check.equal("T-20", "Each team's points", "1 and 1", cavalier.getPoints() + " and " + portmore.getPoints());
 
         // T-28 (normal): ordered by points, then goal difference, then goals scored, then name.

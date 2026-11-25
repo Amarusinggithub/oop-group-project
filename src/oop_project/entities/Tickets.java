@@ -20,7 +20,7 @@ public class Tickets implements Taxable {
 
     // basePrice is the stadium's ticket price times the category multiplier; Fixture.sellTicket works it out
     public Tickets(String ticketNo, Fixture fixture, Spectator holder, TicketCategory category, double basePrice) {
-        if (ticketNo == null || ticketNo.isBlank()) {
+        if (ticketNo == null || ticketNo.trim().isEmpty()) {
             throw new IllegalArgumentException("Ticket number is required.");
         }
         if (fixture == null) {

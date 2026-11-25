@@ -19,7 +19,7 @@ public class StadiumShop {
     private List<Transaction> transactions;
 
     public StadiumShop(String shopId) {
-        if (shopId == null || shopId.isBlank()) {
+        if (shopId == null || shopId.trim().isEmpty()) {
             throw new IllegalArgumentException("Shop ID is required.");
         }
         this.shopId = shopId;
@@ -65,7 +65,13 @@ public class StadiumShop {
     }
 
     public Transaction startTransaction(Spectator customer) {
-        String transactionId = shopId + "-TX" + String.format("%04d", nextTransactionNumber());
+        // Find the next number that is not used yet, so an ID never repeats
+        int number = transactions.size() + 1;
+        String transactionId = shopId + "-TX" + String.format("%04d", number);
+        while (findTransaction(transactionId) != null) {
+            number++;
+            transactionId = shopId + "-TX" + String.format("%04d", number);
+        }
         Transaction transaction = new Transaction(transactionId, customer);
         transactions.add(transaction);
         return transaction;
@@ -83,10 +89,8 @@ public class StadiumShop {
     // Used by LeagueFileManager when loading; menus use startTransaction instead.
     public Transaction restoreTransaction(String transactionId, Spectator customer, Map<Product, Integer> items,
                                           double amountPaid, LocalDateTime dateTime) {
-        for (Transaction existing : transactions) {
-            if (existing.getTransactionId().equalsIgnoreCase(transactionId)) {
-                throw new IllegalArgumentException("Transaction " + transactionId + " is already recorded.");
-            }
+        if (findTransaction(transactionId) != null) {
+            throw new IllegalArgumentException("Transaction " + transactionId + " is already recorded.");
         }
         Transaction transaction = new Transaction(transactionId, customer);
         transaction.restorePaid(items, amountPaid, dateTime);
@@ -94,21 +98,14 @@ public class StadiumShop {
         return transaction;
     }
 
-    // One more than the highest number used so far, so a new ID never repeats a saved one
-    private int nextTransactionNumber() {
-        int highest = 0;
-        String prefix = shopId + "-TX";
+    // Returns null when no transaction has that ID
+    public Transaction findTransaction(String transactionId) {
         for (Transaction transaction : transactions) {
-            String id = transaction.getTransactionId();
-            if (id.startsWith(prefix)) {
-                try {
-                    highest = Math.max(highest, Integer.parseInt(id.substring(prefix.length())));
-                } catch (NumberFormatException ignored) {
-                    // an ID in another format does not affect the numbering
-                }
+            if (transaction.getTransactionId().equalsIgnoreCase(transactionId)) {
+                return transaction;
             }
         }
-        return highest + 1;
+        return null;
     }
 
     // Only paid transactions count as sales

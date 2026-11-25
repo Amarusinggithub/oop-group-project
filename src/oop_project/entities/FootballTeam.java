@@ -36,7 +36,7 @@ public class FootballTeam {
 
     // New teams start as PENDING until the commissioner approves them
     public FootballTeam(String registrationNo, String name, String parish, int maxSquadSize) {
-        if (registrationNo == null || registrationNo.isBlank()) {
+        if (registrationNo == null || registrationNo.trim().isEmpty()) {
             throw new IllegalArgumentException("Registration number is required.");
         }
         this.registrationNo = registrationNo.trim();
@@ -57,7 +57,7 @@ public class FootballTeam {
     }
 
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Team name is required.");
         }
         this.name = name.trim();
@@ -68,7 +68,7 @@ public class FootballTeam {
     }
 
     public void setParish(String parish) {
-        if (parish == null || parish.isBlank()) {
+        if (parish == null || parish.trim().isEmpty()) {
             throw new IllegalArgumentException("Parish is required.");
         }
         this.parish = parish.trim();

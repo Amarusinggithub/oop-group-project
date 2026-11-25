@@ -27,31 +27,31 @@ Choose an option (0 to 10):
  4. Display fixtures
  0. Back
 Choose an option (0 to 4): Home team:
-   1. KPFL01  Harbour View (Registered)
-   2. KPFL02  Waterhouse (Registered)
-   3. KPFL03  Arnett Gardens (Registered)
-   4. KPFL04  Cavalier (Registered)
-   5. KPFL05  Mount Pleasant (Registered)
-   6. KPFL06  Portmore United (Registered)
-   7. KPFL07  Tivoli Gardens (Suspended)
-   8. KPFL08  Dunbeholden (Pending)
+   1. KPFL01  Harbour View (Registered, squad 9/25)
+   2. KPFL02  Waterhouse (Registered, squad 9/25)
+   3. KPFL03  Arnett Gardens (Registered, squad 9/25)
+   4. KPFL04  Cavalier (Registered, squad 9/25)
+   5. KPFL05  Mount Pleasant (Registered, squad 9/25)
+   6. KPFL06  Portmore United (Registered, squad 9/25)
+   7. KPFL07  Tivoli Gardens (Suspended, squad 5/25)
+   8. KPFL08  Dunbeholden (Pending, squad 6/22)
    0. Back
 Choose (0 to 8): Please enter a whole number from 0 to 8.
 Choose (0 to 8): Away team:
-   1. KPFL01  Harbour View (Registered)
-   2. KPFL02  Waterhouse (Registered)
-   3. KPFL03  Arnett Gardens (Registered)
-   4. KPFL04  Cavalier (Registered)
-   5. KPFL05  Mount Pleasant (Registered)
-   6. KPFL06  Portmore United (Registered)
-   7. KPFL07  Tivoli Gardens (Suspended)
-   8. KPFL08  Dunbeholden (Pending)
+   1. KPFL01  Harbour View (Registered, squad 9/25)
+   2. KPFL02  Waterhouse (Registered, squad 9/25)
+   3. KPFL03  Arnett Gardens (Registered, squad 9/25)
+   4. KPFL04  Cavalier (Registered, squad 9/25)
+   5. KPFL05  Mount Pleasant (Registered, squad 9/25)
+   6. KPFL06  Portmore United (Registered, squad 9/25)
+   7. KPFL07  Tivoli Gardens (Suspended, squad 5/25)
+   8. KPFL08  Dunbeholden (Pending, squad 6/22)
    0. Back
-Choose (0 to 8): Stadium:
-   1. National Stadium (Good)
-   2. Anthony Spaulding Sports Complex (Excellent)
-   3. Harbour View Mini Stadium (Good)
-   4. Ferdi Neita Sports Complex (Poor)
+Choose (0 to 8): Stadiums:
+   1. ST01  National Stadium (field: Good)
+   2. ST02  Anthony Spaulding Sports Complex (field: Excellent)
+   3. ST03  Harbour View Mini Stadium (field: Good)
+   4. ST04  Ferdi Neita Sports Complex (field: Poor)
    0. Back
 Choose (0 to 4): Date (YYYY-MM-DD): Please enter a real date as YYYY-MM-DD, for example 2026-12-05.
 Date (YYYY-MM-DD): Please enter a real date as YYYY-MM-DD, for example 2026-12-05.

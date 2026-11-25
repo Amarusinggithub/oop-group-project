@@ -17,23 +17,19 @@ import oop_project.entities.Spectator;
 import oop_project.entities.Stadium;
 import oop_project.entities.StadiumShop;
 import oop_project.entities.Transaction;
-import oop_project.exceptions.InsufficientPaymentException;
 import oop_project.exceptions.LeagueException;
 import oop_project.persistence.LeagueFileManager;
 import oop_project.persistence.ProductFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ShopMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
-    private final ProductFile productFile;
+    private FootballLeague league;
+    private InputHelper input;
+    private ProductFile productFile;
 
-    public ShopMenu(FootballLeague league, InputHelper input, Path dataFolder) {
+    public ShopMenu(FootballLeague league, InputHelper input, String dataFolder) {
         this.league = league;
         this.input = input;
         this.productFile = new LeagueFileManager(dataFolder).getProductFile();
@@ -41,48 +37,51 @@ public class ShopMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Stadium shop", "Back",
-                    "Add product", "Remove product", "Restock product", "New sale", "Display inventory", "Shop sales report");
+            String[] options = {"Add product", "Remove product", "Restock product", "New sale", "Display inventory", "Shop sales report"};
+            int choice = input.menu("Stadium shop", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> addProduct();
-                    case 2 -> removeProduct();
-                    case 3 -> restockProduct();
-                    case 4 -> newSale();
-                    case 5 -> displayInventory();
-                    case 6 -> salesReport();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        addProduct();
+                        break;
+                    case 2:
+                        removeProduct();
+                        break;
+                    case 3:
+                        restockProduct();
+                        break;
+                    case 4:
+                        newSale();
+                        break;
+                    case 5:
+                        displayInventory();
+                        break;
+                    case 6:
+                        salesReport();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
     }
 
-    private Stadium pickStadium() {
-        return input.pick("Stadium shops", league.getStadiums(),
-                s -> s.getName() + " (" + s.getShop().getInventory().size() + " products)");
-    }
-
-    private Product pickProduct(StadiumShop shop) {
-        return input.pick("Products", shop.getInventory(), ShopMenu::productLabel);
-    }
-
-    static String productLabel(Product product) {
-        return String.format("%-8s %-30s $%,9.2f incl. GCT  (%d in stock)", product.getProductCode(), product.getName(),
-                product.getPriceWithTax(), product.getQuantityInStock());
-    }
-
     private void addProduct() throws LeagueException {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
         StadiumShop shop = stadium.getShop();
-        int kind = input.menu("Kind of product", "Back", "Merchandise (jersey, flag, scarf...)", "Food or beverage");
+        String[] options = {"Merchandise (jersey, flag, scarf...)", "Food or beverage"};
+        int kind = input.menu("Kind of product", "Back", options);
         if (kind == 0) {
             return;
         }
@@ -92,8 +91,8 @@ public class ShopMenu {
             return;
         }
         String name = input.readText("Product name", ProductFile.NAME_LENGTH);
-        double price = input.readMoney("Base price before GCT", 0);
-        int quantity = input.readInt("Quantity in stock", 0, 100_000);
+        double price = input.readMoney("Base price before GCT");
+        int quantity = input.readInt("Quantity in stock", 0, 100000);
         Product product;
         if (kind == 1) {
             String type = input.readText("Merchandise type (e.g. Jersey, Flag, Scarf)", ProductFile.TYPE_LENGTH);
@@ -106,16 +105,16 @@ public class ShopMenu {
             product = new FoodItem(code, name, price, quantity, beverage, expiry);
         }
         shop.addProduct(product);
-        System.out.println(product.getCategory() + " added to " + stadium.getName() + "'s shop: " + productLabel(product)
+        System.out.println(product.getCategory() + " added to " + stadium.getName() + "'s shop: " + InputHelper.productLabel(product)
                 + ". It is written to products.dat at the next save.");
     }
 
     private void removeProduct() {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
-        Product product = pickProduct(stadium.getShop());
+        Product product = input.pickProduct(stadium.getShop().getInventory());
         if (product == null) {
             return;
         }
@@ -128,23 +127,23 @@ public class ShopMenu {
     }
 
     private void restockProduct() throws LeagueException {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
-        Product product = pickProduct(stadium.getShop());
+        Product product = input.pickProduct(stadium.getShop().getInventory());
         if (product == null) {
             return;
         }
         // The range allows zero or a negative entry so the product's own rule check reports it
-        int quantity = input.readInt("Quantity to add", -1000, 100_000);
+        int quantity = input.readInt("Quantity to add", -1000, 100000);
         product.restock(quantity);
         System.out.println(product.getName() + " restocked: " + product.getQuantityInStock() + " in stock.");
         writeStock(stadium, product);
     }
 
     private void newSale() throws LeagueException {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
@@ -158,34 +157,27 @@ public class ShopMenu {
             return;
         }
         Transaction sale = shop.startTransaction(customer);
-        try {
-            if (addItems(shop, sale) && takePayment(stadium, sale)) {
-                return;
-            }
+        addItems(shop, sale);
+        if (!sale.getItems().isEmpty()) {
+            takePayment(stadium, sale);
+        }
+        // A sale that was not paid is dropped, so it never counts towards sales
+        if (!sale.isPaid()) {
             shop.cancelTransaction(sale);
             System.out.println("Sale cancelled. No stock was taken.");
-        } catch (LeagueException | RuntimeException e) {
-            // A sale that fails part-way is dropped, so it never counts towards sales
-            if (!sale.isPaid()) {
-                shop.cancelTransaction(sale);
-            }
-            throw e;
         }
     }
 
-    // Returns false when the sale is abandoned or has no items
-    private boolean addItems(StadiumShop shop, Transaction sale) {
+    // Adds products until the user picks 0
+    private void addItems(StadiumShop shop, Transaction sale) {
         while (true) {
             System.out.println();
             System.out.printf("Sale %s for %s: %d item line(s), subtotal $%,.2f%n", sale.getTransactionId(),
                     sale.getCustomer().getName(), sale.getItems().size(), sale.getSubtotal());
             System.out.println("Pick a product to add, or 0 when the order is complete.");
-            Product product = pickProduct(shop);
+            Product product = input.pickProduct(shop.getInventory());
             if (product == null) {
-                if (sale.getItems().isEmpty()) {
-                    return false;
-                }
-                return true;
+                return;
             }
             // The range allows zero or a negative entry so the sale's own rule check reports it
             int quantity = input.readInt("Quantity", -100, 1000);
@@ -198,11 +190,11 @@ public class ShopMenu {
         }
     }
 
-    // Returns true when the sale is paid; false when the customer gives up
-    private boolean takePayment(Stadium stadium, Transaction sale) throws LeagueException {
+    // Asks for the payment until the sale is paid or the customer gives up
+    private void takePayment(Stadium stadium, Transaction sale) {
         System.out.printf("%nSubtotal $%,.2f%nGCT (15%%) $%,.2f%nTotal $%,.2f%n", sale.getSubtotal(), sale.getTax(), sale.getTotal());
         while (true) {
-            double amount = input.readMoney("Amount paid", 0);
+            double amount = input.readMoney("Amount paid");
             try {
                 double change = sale.pay(amount);
                 System.out.printf("Payment accepted. Change: $%,.2f%n%n", change);
@@ -210,11 +202,11 @@ public class ShopMenu {
                 for (Product product : sale.getItems().keySet()) {
                     writeStock(stadium, product);
                 }
-                return true;
-            } catch (InsufficientPaymentException e) {
+                return;
+            } catch (LeagueException e) {
                 System.out.println("Error: " + e.getMessage());
                 if (!input.readYesNo("Enter another amount?")) {
-                    return false;
+                    return;
                 }
             }
         }
@@ -234,7 +226,7 @@ public class ShopMenu {
     }
 
     private void displayInventory() {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
@@ -246,41 +238,46 @@ public class ShopMenu {
         System.out.println(stadium.getName() + " shop (" + shop.getShopId() + ")");
         System.out.printf("%-8s %-30s %-11s %11s %13s %7s %s%n", "Code", "Name", "Category", "Base price", "Price + GCT", "Stock", "Details");
         for (Product product : shop.getInventory()) {
-            System.out.printf("%-8s %-30s %-11s $%,10.2f $%,12.2f %7d %s%n", product.getProductCode(), product.getName(),
-                    product.getCategory(), product.getBasePrice(), product.getPriceWithTax(), product.getQuantityInStock(), details(product));
+            System.out.printf("%-8s %-30s %-11s $%,10.2f %13s %7d %s%n", product.getProductCode(), product.getName(),
+                    product.getCategory(), product.getBasePrice(), InputHelper.priceWithTax(product), product.getQuantityInStock(), details(product));
         }
     }
 
-    // Polymorphism: each kind of product has its own details
+    // Merchandise and food items have different details
     private static String details(Product product) {
-        if (product instanceof Merchandise merchandise) {
+        if (product instanceof Merchandise) {
+            Merchandise merchandise = (Merchandise) product;
             return merchandise.getType() + ", " + merchandise.getSize() + ", " + merchandise.getTeamName();
         }
-        if (product instanceof FoodItem food) {
-            String expiry = food.getExpiryDate() == null ? "no expiry" : "expires " + food.getExpiryDate();
-            return expiry + (food.isExpired() ? " (EXPIRED)" : "");
+        if (product instanceof FoodItem) {
+            FoodItem food = (FoodItem) product;
+            if (food.getExpiryDate() == null) {
+                return "no expiry";
+            }
+            if (food.isExpired()) {
+                return "expires " + food.getExpiryDate() + " (EXPIRED)";
+            }
+            return "expires " + food.getExpiryDate();
         }
         return "";
     }
 
     private void salesReport() {
-        Stadium stadium = pickStadium();
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
         System.out.print(stadium.getShop().salesReport());
-        Map<Product, Integer> sold = new LinkedHashMap<>();
-        for (Transaction transaction : stadium.getShop().getTransactions()) {
-            if (transaction.isPaid()) {
-                for (Map.Entry<Product, Integer> item : transaction.getItems().entrySet()) {
-                    sold.merge(item.getKey(), item.getValue(), Integer::sum);
+        System.out.println("Units sold by product:");
+        for (Product product : stadium.getShop().getInventory()) {
+            int sold = 0;
+            for (Transaction transaction : stadium.getShop().getTransactions()) {
+                if (transaction.isPaid() && transaction.getItems().containsKey(product)) {
+                    sold = sold + transaction.getItems().get(product);
                 }
             }
-        }
-        if (!sold.isEmpty()) {
-            System.out.println("Units sold by product:");
-            for (Map.Entry<Product, Integer> item : sold.entrySet()) {
-                System.out.printf("  %-30s %5d%n", item.getKey().getName(), item.getValue());
+            if (sold > 0) {
+                System.out.printf("  %-30s %5d%n", product.getName(), sold);
             }
         }
     }

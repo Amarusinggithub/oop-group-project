@@ -27,7 +27,7 @@ public abstract class Person {
     }
 
     public void setId(String id) {
-        if (id == null || id.isBlank()) {
+        if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID is required.");
         }
         Id = id.trim();
@@ -38,7 +38,7 @@ public abstract class Person {
     }
 
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name is required.");
         }
         this.name = name.trim();
@@ -60,7 +60,7 @@ public abstract class Person {
     }
 
     public void setGender(String gender) {
-        if (gender == null || gender.isBlank()) {
+        if (gender == null || gender.trim().isEmpty()) {
             throw new IllegalArgumentException("Gender is required.");
         }
         this.gender = gender.trim();

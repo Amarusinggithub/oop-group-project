@@ -41,6 +41,9 @@ public class FoodItem extends Product {
 
     @Override
     public String getCategory() {
-        return beverage ? "Beverage" : "Food";
+        if (beverage) {
+            return "Beverage";
+        }
+        return "Food";
     }
 }

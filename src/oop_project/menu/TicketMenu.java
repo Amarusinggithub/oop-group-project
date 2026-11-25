@@ -17,8 +17,8 @@ import oop_project.enums.TicketCategory;
 import oop_project.exceptions.LeagueException;
 
 public class TicketMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public TicketMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -27,18 +27,29 @@ public class TicketMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Ticket sales", "Back", "Sell ticket", "Show seats remaining", "Display tickets sold for a fixture");
+            String[] options = {"Sell ticket", "Show seats remaining", "Display tickets sold for a fixture"};
+            int choice = input.menu("Ticket sales", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> sellTicket();
-                    case 2 -> showSeatsRemaining();
-                    case 3 -> displayTickets();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        sellTicket();
+                        break;
+                    case 2:
+                        showSeatsRemaining();
+                        break;
+                    case 3:
+                        displayTickets();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -88,14 +99,13 @@ public class TicketMenu {
         if (spectator == null) {
             return;
         }
-        TicketCategory category = input.pickEnum("Ticket category", TicketCategory.values(),
-                c -> c.getCategory() + " (" + c.getPriceMultiplier() + " x base price)");
+        TicketCategory category = input.pickTicketCategory();
         if (category == null) {
             return;
         }
         Tickets ticket = fixture.sellTicket(spectator, category);
-        System.out.printf("Ticket %s sold to %s: %s, $%,.2f incl. GCT. Seats remaining: %,d%n", ticket.getTicketNo(),
-                spectator.getName(), category.getCategory(), ticket.getPriceWithTax(), fixture.getSeatsRemaining());
+        System.out.printf("Ticket %s sold to %s: %s, %s incl. GCT. Seats remaining: %,d%n", ticket.getTicketNo(),
+                spectator.getName(), category.getCategory(), InputHelper.priceWithTax(ticket), fixture.getSeatsRemaining());
     }
 
     private void showSeatsRemaining() {
@@ -106,7 +116,7 @@ public class TicketMenu {
     }
 
     private void displayTickets() {
-        Fixture fixture = input.pick("Fixtures", league.getFixturesByDate(), FixtureMenu::label);
+        Fixture fixture = input.pickFixture("Fixtures", league.getFixturesByDate());
         if (fixture == null) {
             return;
         }
@@ -116,8 +126,8 @@ public class TicketMenu {
         }
         System.out.printf("%-14s %-24s %-11s %12s%n", "Ticket", "Holder", "Category", "Price + GCT");
         for (Tickets ticket : fixture.getTickets()) {
-            System.out.printf("%-14s %-24s %-11s $%,11.2f%n", ticket.getTicketNo(), ticket.getHolder().getName(),
-                    ticket.getCategory().getCategory(), ticket.getPriceWithTax());
+            System.out.printf("%-14s %-24s %-11s %12s%n", ticket.getTicketNo(), ticket.getHolder().getName(),
+                    ticket.getCategory().getCategory(), InputHelper.priceWithTax(ticket));
         }
         System.out.printf("%d ticket(s), revenue $%,.2f incl. GCT%n", fixture.getTickets().size(), fixture.getTicketRevenue());
     }

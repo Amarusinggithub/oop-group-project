@@ -16,8 +16,8 @@ import oop_project.enums.PlayerStatus;
 import oop_project.exceptions.LeagueException;
 
 public class PersonnelMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public PersonnelMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -26,42 +26,52 @@ public class PersonnelMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Players & coaches", "Back",
-                    "Add player", "Update player", "Remove player", "Record goals for a player",
-                    "Add coach", "Update coach", "Remove coach", "Display a team's squad and staff");
+            String[] options = {"Add player", "Update player", "Remove player", "Record goals for a player",
+                    "Add coach", "Update coach", "Remove coach", "Display a team's squad and staff"};
+            int choice = input.menu("Players & coaches", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> addPlayer();
-                    case 2 -> updatePlayer();
-                    case 3 -> removePlayer();
-                    case 4 -> recordGoals();
-                    case 5 -> addCoach();
-                    case 6 -> updateCoach();
-                    case 7 -> removeCoach();
-                    case 8 -> displaySquad();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        addPlayer();
+                        break;
+                    case 2:
+                        updatePlayer();
+                        break;
+                    case 3:
+                        removePlayer();
+                        break;
+                    case 4:
+                        recordGoals();
+                        break;
+                    case 5:
+                        addCoach();
+                        break;
+                    case 6:
+                        updateCoach();
+                        break;
+                    case 7:
+                        removeCoach();
+                        break;
+                    case 8:
+                        displaySquad();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
     }
 
     private FootballTeam pickTeam() {
-        return input.pick("Teams", league.getTeams(), t -> t.getName() + " (squad " + t.getSquadSize() + "/" + t.getMaxSquadSize() + ")");
-    }
-
-    private Player pickPlayer(FootballTeam team) {
-        return input.pick(team.getName() + " players", team.getPlayers(),
-                p -> "#" + p.getJerseyNumber() + " " + p.getName() + " (" + p.getId() + ", " + p.getPosition() + ")");
-    }
-
-    private Coach pickCoach(FootballTeam team) {
-        return input.pick(team.getName() + " coaches", team.getCoaches(),
-                c -> c.getName() + " (" + c.getId() + ", " + c.getCoachingRole() + ")");
+        return input.pickTeam("Teams", league.getTeams());
     }
 
     // A person ID must not already belong to a player or coach anywhere in the league
@@ -87,7 +97,7 @@ public class PersonnelMenu {
         String gender = input.readText("Gender (e.g. Male or Female)");
         String position = input.readText("Position (e.g. Goalkeeper, Defender, Midfielder, Forward)");
         int jersey = input.readInt("Jersey number", 1, Player.MAX_JERSEY_NUMBER);
-        PlayerStatus status = input.pickEnum("Status", PlayerStatus.values(), PlayerStatus::getStatus);
+        PlayerStatus status = input.pickPlayerStatus();
         if (status == null) {
             status = PlayerStatus.ACTIVE;
         }
@@ -102,7 +112,7 @@ public class PersonnelMenu {
         if (team == null) {
             return;
         }
-        Player player = pickPlayer(team);
+        Player player = input.pickPlayer(team);
         if (player == null) {
             return;
         }
@@ -110,7 +120,7 @@ public class PersonnelMenu {
         int jersey = input.readOptionalInt("Jersey number", player.getJerseyNumber(), 1, Player.MAX_JERSEY_NUMBER);
         team.changeJerseyNumber(player, jersey);
         System.out.println("Current status: " + player.getStatus().getStatus() + " (0 keeps it)");
-        PlayerStatus status = input.pickEnum("New status", PlayerStatus.values(), PlayerStatus::getStatus);
+        PlayerStatus status = input.pickPlayerStatus();
         if (status != null) {
             player.setStatus(status);
         }
@@ -122,7 +132,7 @@ public class PersonnelMenu {
         if (team == null) {
             return;
         }
-        Player player = pickPlayer(team);
+        Player player = input.pickPlayer(team);
         if (player == null) {
             return;
         }
@@ -139,7 +149,7 @@ public class PersonnelMenu {
         if (team == null) {
             return;
         }
-        Player player = pickPlayer(team);
+        Player player = input.pickPlayer(team);
         if (player == null) {
             return;
         }
@@ -173,14 +183,14 @@ public class PersonnelMenu {
         if (team == null) {
             return;
         }
-        Coach coach = pickCoach(team);
+        Coach coach = input.pickCoach(team);
         if (coach == null) {
             return;
         }
         coach.setQualification(input.readOptionalText("Qualification", coach.getQualification()));
         coach.setCoachingRole(input.readOptionalText("Coaching role", coach.getCoachingRole()));
         if (input.readYesNo("Move " + coach.getName() + " to another team?")) {
-            FootballTeam newTeam = input.pick("Teams", league.getTeams(), FootballTeam::getName);
+            FootballTeam newTeam = pickTeam();
             if (newTeam != null) {
                 coach.assignTeam(newTeam);
             }
@@ -193,7 +203,7 @@ public class PersonnelMenu {
         if (team == null) {
             return;
         }
-        Coach coach = pickCoach(team);
+        Coach coach = input.pickCoach(team);
         if (coach == null) {
             return;
         }

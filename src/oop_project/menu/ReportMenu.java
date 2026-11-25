@@ -18,12 +18,11 @@ import oop_project.enums.FixtureStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class ReportMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public ReportMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -32,37 +31,59 @@ public class ReportMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Reports & search", "Back",
-                    "Report: league standings", "Report: fixtures and results", "Report: shop sales by stadium",
+            String[] options = {"Report: league standings", "Report: fixtures and results", "Report: shop sales by stadium",
                     "Report: top scorers", "Report: attendance and ticket revenue", "Report: squad list for a team",
                     "Search: find a team", "Search: find a player", "Search: find fixtures by date or team",
-                    "Search: find a shop product");
+                    "Search: find a shop product"};
+            int choice = input.menu("Reports & search", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 System.out.println();
                 switch (choice) {
-                    case 1 -> System.out.print(league.standingsReport());
-                    case 2 -> System.out.print(league.fixturesReport());
-                    case 3 -> System.out.print(league.shopSalesReport());
-                    case 4 -> System.out.print(topScorersReport(league));
-                    case 5 -> System.out.print(attendanceReport(league));
-                    case 6 -> squadReport();
-                    case 7 -> findTeam();
-                    case 8 -> findPlayer();
-                    case 9 -> findFixtures();
-                    case 10 -> findProduct();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        System.out.print(league.standingsReport());
+                        break;
+                    case 2:
+                        System.out.print(league.fixturesReport());
+                        break;
+                    case 3:
+                        System.out.print(league.shopSalesReport());
+                        break;
+                    case 4:
+                        System.out.print(topScorersReport());
+                        break;
+                    case 5:
+                        System.out.print(attendanceReport());
+                        break;
+                    case 6:
+                        showSquad();
+                        break;
+                    case 7:
+                        findTeam();
+                        break;
+                    case 8:
+                        findPlayer();
+                        break;
+                    case 9:
+                        findFixtures();
+                        break;
+                    case 10:
+                        findProduct();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (IllegalArgumentException | IllegalStateException e) {
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
     }
 
     // RPT-04: players with at least one goal, highest first
-    public static String topScorersReport(FootballLeague league) {
+    private String topScorersReport() {
         List<Player> scorers = new ArrayList<>();
         for (FootballTeam team : league.getTeams()) {
             for (Player player : team.getPlayers()) {
@@ -74,7 +95,17 @@ public class ReportMenu {
         if (scorers.isEmpty()) {
             return "There is nothing to report yet: no goals have been recorded for any player.\n";
         }
-        scorers.sort(Comparator.comparingInt(Player::getGaols).reversed().thenComparing(Player::getName));
+        // Bubble sort: most goals first
+        for (int pass = 0; pass < scorers.size() - 1; pass++) {
+            for (int i = 0; i < scorers.size() - 1 - pass; i++) {
+                Player first = scorers.get(i);
+                Player second = scorers.get(i + 1);
+                if (second.getGaols() > first.getGaols()) {
+                    scorers.set(i, second);
+                    scorers.set(i + 1, first);
+                }
+            }
+        }
         StringBuilder report = new StringBuilder("TOP SCORERS\n");
         report.append(String.format("%-4s %-24s %-22s %-12s %5s%n", "Pos", "Player", "Team", "Position", "Goals"));
         int position = 1;
@@ -86,7 +117,7 @@ public class ReportMenu {
     }
 
     // RPT-05: tickets sold against capacity, and ticket revenue including GCT, for every fixture that was not cancelled
-    public static String attendanceReport(FootballLeague league) {
+    private String attendanceReport() {
         List<Fixture> fixtures = new ArrayList<>();
         for (Fixture fixture : league.getFixturesByDate()) {
             if (fixture.getStatus() != FixtureStatus.CANCELLED) {
@@ -116,23 +147,37 @@ public class ReportMenu {
     }
 
     // RPT-06: a team's players by jersey number, with whether each meets the minimum age
-    public static String squadReport(FootballTeam team) {
+    private String squadReport(FootballTeam team) {
         if (team.getPlayers().isEmpty()) {
             return "There is nothing to report yet: " + team.getName() + " has no players.\n";
         }
         List<Player> players = new ArrayList<>(team.getPlayers());
-        players.sort(Comparator.comparingInt(Player::getJerseyNumber));
+        // Bubble sort: lowest jersey number first
+        for (int pass = 0; pass < players.size() - 1; pass++) {
+            for (int i = 0; i < players.size() - 1 - pass; i++) {
+                Player first = players.get(i);
+                Player second = players.get(i + 1);
+                if (second.getJerseyNumber() < first.getJerseyNumber()) {
+                    players.set(i, second);
+                    players.set(i + 1, first);
+                }
+            }
+        }
         StringBuilder report = new StringBuilder("SQUAD LIST - " + team.getName() + " (" + team.getSquadSize() + "/" + team.getMaxSquadSize() + ")\n");
         report.append(String.format("%-4s %-8s %-24s %-12s %4s %-10s %s%n", "No.", "ID", "Player", "Position", "Age", "Status", "Eligible"));
         for (Player player : players) {
+            String eligible = "No";
+            if (player.isEligible()) {
+                eligible = "Yes";
+            }
             report.append(String.format("%-4d %-8s %-24s %-12s %4d %-10s %s%n", player.getJerseyNumber(), player.getId(), player.getName(),
-                    player.getPosition(), player.getAge(), player.getStatus().getStatus(), player.isEligible() ? "Yes" : "No"));
+                    player.getPosition(), player.getAge(), player.getStatus().getStatus(), eligible));
         }
         return report.toString();
     }
 
-    private void squadReport() {
-        FootballTeam team = input.pick("Teams", league.getTeams(), FootballTeam::getName);
+    private void showSquad() {
+        FootballTeam team = input.pickTeam("Teams", league.getTeams());
         if (team != null) {
             System.out.print(squadReport(team));
         }
@@ -162,13 +207,14 @@ public class ReportMenu {
 
     // SR-03
     private void findFixtures() {
-        int choice = input.menu("Find fixtures", "Back", "By date", "By team");
+        String[] options = {"By date", "By team"};
+        int choice = input.menu("Find fixtures", "Back", options);
         List<Fixture> fixtures;
         if (choice == 1) {
             LocalDate date = input.readDate("Date");
             fixtures = league.findFixtures(date);
         } else if (choice == 2) {
-            FootballTeam team = input.pick("Teams", league.getTeams(), FootballTeam::getName);
+            FootballTeam team = input.pickTeam("Teams", league.getTeams());
             if (team == null) {
                 return;
             }
@@ -193,7 +239,7 @@ public class ReportMenu {
             Product product = stadium.getShop().findProduct(code);
             if (product != null) {
                 found = true;
-                System.out.println(stadium.getName() + ": " + ShopMenu.productLabel(product) + ", " + product.getCategory());
+                System.out.println(stadium.getName() + ": " + InputHelper.productLabel(product) + ", " + product.getCategory());
             }
         }
         if (!found) {

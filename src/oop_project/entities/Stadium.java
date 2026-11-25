@@ -25,7 +25,7 @@ public class Stadium {
     private StadiumShop shop;
 
     public Stadium(String stadiumId, String name, String location, int seatingCapacity, double ticketPrice) {
-        if (stadiumId == null || stadiumId.isBlank()) {
+        if (stadiumId == null || stadiumId.trim().isEmpty()) {
             throw new IllegalArgumentException("Stadium ID is required.");
         }
         this.stadiumId = stadiumId;
@@ -48,7 +48,7 @@ public class Stadium {
     }
 
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Stadium name is required.");
         }
         this.name = name;
@@ -59,7 +59,7 @@ public class Stadium {
     }
 
     public void setLocation(String location) {
-        if (location == null || location.isBlank()) {
+        if (location == null || location.trim().isEmpty()) {
             throw new IllegalArgumentException("Stadium location is required.");
         }
         this.location = location;

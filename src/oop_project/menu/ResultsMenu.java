@@ -13,8 +13,8 @@ import oop_project.entities.FootballTeam;
 import oop_project.exceptions.LeagueException;
 
 public class ResultsMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public ResultsMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -23,17 +23,26 @@ public class ResultsMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Results & standings", "Back", "Record result", "Display standings");
+            String[] options = {"Record result", "Display standings"};
+            int choice = input.menu("Results & standings", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> recordResult();
-                    case 2 -> System.out.print(league.standingsReport());
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        recordResult();
+                        break;
+                    case 2:
+                        System.out.print(league.standingsReport());
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -49,9 +58,12 @@ public class ResultsMenu {
         int awayGoals = input.readInt(fixture.getAwayTeam().getName() + " goals", -20, 50);
         league.recordResult(fixture, homeGoals, awayGoals);
         FootballTeam winner = fixture.getWinner();
+        String outcome = "A draw: 1 point each.";
+        if (winner != null) {
+            outcome = winner.getName() + " win and take 3 points.";
+        }
         System.out.println("Result recorded: " + fixture.getHomeTeam().getName() + " " + fixture.getResult().getScoreLine() + " "
-                + fixture.getAwayTeam().getName() + " (attendance " + fixture.getResult().getAttendance() + "). "
-                + (winner == null ? "A draw: 1 point each." : winner.getName() + " win and take 3 points."));
+                + fixture.getAwayTeam().getName() + " (attendance " + fixture.getResult().getAttendance() + "). " + outcome);
         System.out.println("Fixture " + fixture.getFixtureId() + " is now " + fixture.getStatus().getStatus() + ".");
         System.out.println();
         System.out.print(league.standingsReport());

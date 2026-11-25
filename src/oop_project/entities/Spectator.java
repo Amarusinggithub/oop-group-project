@@ -19,8 +19,14 @@ public class Spectator extends Person {
 
     public Spectator(String id, String name, int age, String gender, List<Tickets> tickets, List<Transaction> purchases) {
         super(id, name, age, gender);
-        this.tickets = tickets == null ? new ArrayList<>() : new ArrayList<>(tickets);
-        this.purchases = purchases == null ? new ArrayList<>() : new ArrayList<>(purchases);
+        this.tickets = new ArrayList<>();
+        if (tickets != null) {
+            this.tickets.addAll(tickets);
+        }
+        this.purchases = new ArrayList<>();
+        if (purchases != null) {
+            this.purchases.addAll(purchases);
+        }
     }
 
     // Called by Fixture.sellTicket; use that rather than calling this directly
@@ -38,7 +44,10 @@ public class Spectator extends Person {
     }
 
     public void setTickets(List<Tickets> tickets) {
-        this.tickets = tickets == null ? new ArrayList<>() : new ArrayList<>(tickets);
+        this.tickets = new ArrayList<>();
+        if (tickets != null) {
+            this.tickets.addAll(tickets);
+        }
     }
 
     public List<Transaction> getPurchases() {
@@ -46,7 +55,10 @@ public class Spectator extends Person {
     }
 
     public void setPurchases(List<Transaction> purchases) {
-        this.purchases = purchases == null ? new ArrayList<>() : new ArrayList<>(purchases);
+        this.purchases = new ArrayList<>();
+        if (purchases != null) {
+            this.purchases.addAll(purchases);
+        }
     }
 
     @Override

@@ -16,8 +16,8 @@ import oop_project.exceptions.LeagueException;
 import oop_project.persistence.ProductFile;
 
 public class StadiumMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public StadiumMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -26,19 +26,29 @@ public class StadiumMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Stadiums", "Back",
-                    "Register stadium", "Update field condition, ticket price or capacity", "Display stadiums");
+            String[] options = {"Register stadium", "Update field condition, ticket price or capacity", "Display stadiums"};
+            int choice = input.menu("Stadiums", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> registerStadium();
-                    case 2 -> updateStadium();
-                    case 3 -> displayStadiums();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        registerStadium();
+                        break;
+                    case 2:
+                        updateStadium();
+                        break;
+                    case 3:
+                        displayStadiums();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -52,9 +62,9 @@ public class StadiumMenu {
         }
         String name = input.readText("Stadium name");
         String location = input.readText("Location");
-        int capacity = input.readInt("Seating capacity", 1, 200_000);
-        double price = input.readMoney("Base (General) ticket price before GCT", 0);
-        FieldCondition condition = input.pickEnum("Field condition", FieldCondition.values(), FieldCondition::getCondition);
+        int capacity = input.readInt("Seating capacity", 1, 200000);
+        double price = input.readMoney("Base (General) ticket price before GCT");
+        FieldCondition condition = input.pickFieldCondition();
         Stadium stadium = new Stadium(id, name, location, capacity, price);
         if (condition != null) {
             stadium.setFieldCondition(condition);
@@ -64,19 +74,19 @@ public class StadiumMenu {
     }
 
     private void updateStadium() {
-        Stadium stadium = input.pick("Stadiums", league.getStadiums(), s -> s.getStadiumId() + "  " + s.getName());
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
         System.out.println("Current field condition: " + stadium.getFieldCondition().getCondition() + " (0 keeps it)");
-        FieldCondition condition = input.pickEnum("New field condition", FieldCondition.values(), FieldCondition::getCondition);
+        FieldCondition condition = input.pickFieldCondition();
         if (condition != null) {
             stadium.setFieldCondition(condition);
         }
-        stadium.setTicketPrice(input.readOptionalMoney("Base ticket price", stadium.getTicketPrice(), 0));
+        stadium.setTicketPrice(input.readOptionalMoney("Base ticket price", stadium.getTicketPrice()));
         // SRS rule: ticket sales cannot exceed capacity, so capacity cannot drop below tickets already sold
         int minimumCapacity = Math.max(1, mostTicketsSold(stadium));
-        stadium.setSeatingCapacity(input.readOptionalInt("Seating capacity", stadium.getSeatingCapacity(), minimumCapacity, 200_000));
+        stadium.setSeatingCapacity(input.readOptionalInt("Seating capacity", stadium.getSeatingCapacity(), minimumCapacity, 200000));
         System.out.println("Stadium updated: " + stadium.displayInfo());
         if (!stadium.getFieldCondition().isPlayable()) {
             System.out.println("Note: the field is unplayable, so its fixtures will fail inspection.");
@@ -101,8 +111,10 @@ public class StadiumMenu {
         }
         System.out.printf("%-6s %-34s %-16s %9s %-11s %12s %s%n", "ID", "Name", "Location", "Capacity", "Field", "Ticket", "Current teams");
         for (Stadium stadium : league.getStadiums()) {
-            String teams = stadium.getAssignedTeams().isEmpty() ? "-"
-                    : stadium.getAssignedTeams().get(0).getName() + " vs " + stadium.getAssignedTeams().get(1).getName();
+            String teams = "-";
+            if (!stadium.getAssignedTeams().isEmpty()) {
+                teams = stadium.getAssignedTeams().get(0).getName() + " vs " + stadium.getAssignedTeams().get(1).getName();
+            }
             System.out.printf("%-6s %-34s %-16s %,9d %-11s $%,11.2f %s%n", stadium.getStadiumId(), stadium.getName(),
                     stadium.getLocation(), stadium.getSeatingCapacity(), stadium.getFieldCondition().getCondition(),
                     stadium.getTicketPrice(), teams);

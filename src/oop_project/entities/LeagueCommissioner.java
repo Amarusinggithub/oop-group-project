@@ -25,7 +25,7 @@ public class LeagueCommissioner extends Person {
     }
 
     public void setOfficeTitle(String officeTitle) {
-        if (officeTitle == null || officeTitle.isBlank()) {
+        if (officeTitle == null || officeTitle.trim().isEmpty()) {
             throw new IllegalArgumentException("Office title is required.");
         }
         this.officeTitle = officeTitle.trim();
@@ -67,12 +67,20 @@ public class LeagueCommissioner extends Person {
                 fixture.getOfficials().size() + " assigned"));
         report.append(checkLine("Field is playable", fixture.getStadium().getFieldCondition().isPlayable(),
                 fixture.getStadium().getFieldCondition().getCondition()));
-        report.append(inspectFixture(fixture) ? "Result: READY\n" : "Result: NOT READY\n");
+        if (inspectFixture(fixture)) {
+            report.append("Result: READY\n");
+        } else {
+            report.append("Result: NOT READY\n");
+        }
         return report.toString();
     }
 
     private static String checkLine(String check, boolean passed, String detail) {
-        return String.format("  [%s] %-40s (%s)%n", passed ? "OK" : "X ", check, detail);
+        String mark = "X ";
+        if (passed) {
+            mark = "OK";
+        }
+        return String.format("  [%s] %-40s (%s)%n", mark, check, detail);
     }
 
     @Override

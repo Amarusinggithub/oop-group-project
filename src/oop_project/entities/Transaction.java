@@ -30,7 +30,7 @@ public class Transaction {
 
     // StadiumShop.startTransaction creates transactions and gives them their IDs
     public Transaction(String transactionId, Spectator customer) {
-        if (transactionId == null || transactionId.isBlank()) {
+        if (transactionId == null || transactionId.trim().isEmpty()) {
             throw new IllegalArgumentException("Transaction ID is required.");
         }
         if (customer == null) {
@@ -78,25 +78,29 @@ public class Transaction {
             throw new InvalidDataException("Quantity must be at least 1.");
         }
         // SRS rule: a product cannot be sold beyond the quantity in stock
-        int wanted = items.getOrDefault(product, 0) + quantity;
+        int wanted = quantity;
+        if (items.containsKey(product)) {
+            wanted = wanted + items.get(product);
+        }
         if (wanted > product.getQuantityInStock()) {
             throw new OutOfStockException("Only " + product.getQuantityInStock() + " of " + product.getName() + " in stock.");
         }
-        items.merge(product, quantity, Integer::sum);
+        items.put(product, wanted);
     }
 
     // Takes a product out of an unpaid sale
     public void removeItem(Product product) {
         requireUnpaid();
-        if (items.remove(product) == null) {
+        if (!items.containsKey(product)) {
             throw new IllegalArgumentException(product + " is not in this sale.");
         }
+        items.remove(product);
     }
 
     public double getSubtotal() {
         double subtotal = 0;
-        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            subtotal += entry.getKey().getBasePrice() * entry.getValue();
+        for (Product product : items.keySet()) {
+            subtotal += product.getBasePrice() * items.get(product);
         }
         return roundToCents(subtotal);
     }
@@ -122,15 +126,14 @@ public class Transaction {
                     "Payment of $%.2f is less than the total of $%.2f.", amount, getTotal()));
         }
         // SRS rule: a product cannot be sold beyond the quantity in stock
-        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            Product product = entry.getKey();
-            if (entry.getValue() > product.getQuantityInStock()) {
+        for (Product product : items.keySet()) {
+            if (items.get(product) > product.getQuantityInStock()) {
                 throw new OutOfStockException("Only " + product.getQuantityInStock() + " of "
                         + product.getName() + " left in stock.");
             }
         }
-        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            entry.getKey().reduceStock(entry.getValue());
+        for (Product product : items.keySet()) {
+            product.reduceStock(items.get(product));
         }
         amountPaid = roundToCents(amount);
         paid = true;
@@ -144,9 +147,8 @@ public class Transaction {
         receipt.append("Receipt ").append(transactionId).append("\n");
         receipt.append("Customer: ").append(customer.getName()).append("\n");
         receipt.append("Date: ").append(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).append("\n");
-        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            Product product = entry.getKey();
-            int quantity = entry.getValue();
+        for (Product product : items.keySet()) {
+            int quantity = items.get(product);
             receipt.append(String.format("%-24s %3d x $%,8.2f  $%,10.2f%n", product.getName(), quantity,
                     product.getBasePrice(), product.getBasePrice() * quantity));
         }

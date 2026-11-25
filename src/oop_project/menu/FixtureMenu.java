@@ -19,8 +19,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class FixtureMenu {
-    private final FootballLeague league;
-    private final InputHelper input;
+    private FootballLeague league;
+    private InputHelper input;
 
     public FixtureMenu(FootballLeague league, InputHelper input) {
         this.league = league;
@@ -29,47 +29,49 @@ public class FixtureMenu {
 
     public void run() {
         while (true) {
-            int choice = input.menu("Fixtures", "Back",
-                    "Create fixture", "Reschedule fixture", "Cancel fixture", "Display fixtures");
+            String[] options = {"Create fixture", "Reschedule fixture", "Cancel fixture", "Display fixtures"};
+            int choice = input.menu("Fixtures", "Back", options);
             if (choice == 0) {
                 return;
             }
             try {
                 switch (choice) {
-                    case 1 -> createFixture();
-                    case 2 -> rescheduleFixture();
-                    case 3 -> cancelFixture();
-                    case 4 -> displayFixtures();
-                    default -> System.out.println("Please choose an option from the menu.");
+                    case 1:
+                        createFixture();
+                        break;
+                    case 2:
+                        rescheduleFixture();
+                        break;
+                    case 3:
+                        cancelFixture();
+                        break;
+                    case 4:
+                        displayFixtures();
+                        break;
+                    default:
+                        System.out.println("Please choose an option from the menu.");
+                        break;
                 }
-            } catch (LeagueException | IllegalArgumentException | IllegalStateException e) {
+            } catch (LeagueException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
     }
 
-    // How a fixture is shown in every numbered list
-    static String label(Fixture fixture) {
-        return fixture.getFixtureId() + "  " + fixture + " at " + fixture.getStadium().getName()
-                + " [" + fixture.getStatus().getStatus() + "]";
-    }
-
-    static String teamLabel(FootballTeam team) {
-        return team.getRegistrationNo() + "  " + team.getName() + " (" + team.getStatus().getStatus() + ")";
-    }
-
     // Lets the user pick one of the scheduled fixtures; returns null for Back
     static Fixture pickScheduled(FootballLeague league, InputHelper input) {
-        return input.pick("Scheduled fixtures", league.getFixtures(FixtureStatus.SCHEDULED), FixtureMenu::label);
+        return input.pickFixture("Scheduled fixtures", league.getFixtures(FixtureStatus.SCHEDULED));
     }
 
     private void createFixture() throws LeagueException {
         // Every team is listed, with its status, so the user sees why a pending or suspended team is refused
-        FootballTeam home = input.pick("Home team", league.getTeams(), FixtureMenu::teamLabel);
+        FootballTeam home = input.pickTeam("Home team", league.getTeams());
         if (home == null) {
             return;
         }
-        FootballTeam away = input.pick("Away team", league.getTeams(), FixtureMenu::teamLabel);
+        FootballTeam away = input.pickTeam("Away team", league.getTeams());
         if (away == null) {
             return;
         }
@@ -77,7 +79,7 @@ public class FixtureMenu {
             System.out.println("Error: a team cannot play itself. Pick two different teams.");
             return;
         }
-        Stadium stadium = input.pick("Stadium", league.getStadiums(), s -> s.getName() + " (" + s.getFieldCondition().getCondition() + ")");
+        Stadium stadium = input.pickStadium(league.getStadiums());
         if (stadium == null) {
             return;
         }
@@ -95,15 +97,22 @@ public class FixtureMenu {
         if (fixture == null) {
             return;
         }
-        System.out.println("Current: " + label(fixture));
+        System.out.println("Current: " + fixture.displayInfo());
         LocalDate date = input.readOptionalDate("New date", "no change");
         LocalTime kickOff = input.readOptionalTime("New kick-off time", "no change");
         System.out.println("Pick a new stadium, or 0 to keep " + fixture.getStadium().getName() + ".");
-        Stadium stadium = input.pick("Stadium", league.getStadiums(), Stadium::getName);
-        league.rescheduleFixture(fixture,
-                stadium == null ? fixture.getStadium() : stadium,
-                date == null ? fixture.getDate() : date,
-                kickOff == null ? fixture.getKickOff() : kickOff);
+        Stadium stadium = input.pickStadium(league.getStadiums());
+        // Anything left blank keeps its current value
+        if (stadium == null) {
+            stadium = fixture.getStadium();
+        }
+        if (date == null) {
+            date = fixture.getDate();
+        }
+        if (kickOff == null) {
+            kickOff = fixture.getKickOff();
+        }
+        league.rescheduleFixture(fixture, stadium, date, kickOff);
         System.out.println("Fixture " + fixture.getFixtureId() + " rescheduled: " + fixture + " at " + fixture.getStadium().getName());
     }
 
