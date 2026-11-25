@@ -1,0 +1,8 @@
+KPFL01,Harbour View,Kingston,25,REGISTERED
+KPFL02,Waterhouse,Kingston,25,REGISTERED
+KPFL03,Arnett Gardens,Kingston,25,REGISTERED
+KPFL04,Cavalier,St. Andrew,25,REGISTERED
+KPFL05,Mount Pleasant,St. Ann,25,REGISTERED
+KPFL06,Portmore United,St. Catherine,25,REGISTERED
+KPFL07,Tivoli Gardens,Kingston,25,SUSPENDED
+KPFL08,Dunbeholden,St. Catherine,22,PENDING

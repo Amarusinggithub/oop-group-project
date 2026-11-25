@@ -40,7 +40,7 @@ public class Transaction {
         this.customer = customer;
         this.items = new LinkedHashMap<>();
         this.amountPaid = 0;
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = LocalDateTime.now().withNano(0);
     }
 
     public String getTransactionId() {
@@ -68,15 +68,29 @@ public class Transaction {
     }
 
     // Adding a product that is already in the transaction increases its quantity
-    public void addItem(Product product, int quantity) {
+    public void addItem(Product product, int quantity) throws InvalidDataException, OutOfStockException {
         requireUnpaid();
         if (product == null) {
             throw new IllegalArgumentException("Product is required.");
         }
+        // SRS rule: quantities cannot be negative (or zero)
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero.");
+            throw new InvalidDataException("Quantity must be at least 1.");
+        }
+        // SRS rule: a product cannot be sold beyond the quantity in stock
+        int wanted = items.getOrDefault(product, 0) + quantity;
+        if (wanted > product.getQuantityInStock()) {
+            throw new OutOfStockException("Only " + product.getQuantityInStock() + " of " + product.getName() + " in stock.");
         }
         items.merge(product, quantity, Integer::sum);
+    }
+
+    // Takes a product out of an unpaid sale
+    public void removeItem(Product product) {
+        requireUnpaid();
+        if (items.remove(product) == null) {
+            throw new IllegalArgumentException(product + " is not in this sale.");
+        }
     }
 
     public double getSubtotal() {
@@ -120,7 +134,7 @@ public class Transaction {
         }
         amountPaid = roundToCents(amount);
         paid = true;
-        dateTime = LocalDateTime.now();
+        dateTime = LocalDateTime.now().withNano(0);
         customer.addPurchase(this);
         return roundToCents(amountPaid - getTotal());
     }
@@ -141,11 +155,22 @@ public class Transaction {
         receipt.append(String.format("%-40s $%,10.2f%n", "Total", getTotal()));
         if (isPaid()) {
             receipt.append(String.format("%-40s $%,10.2f%n", "Paid", amountPaid));
-            receipt.append(String.format("%-40s $%,10.2f%n", "Change", amountPaid - getTotal()));
+            receipt.append(String.format("%-40s $%,10.2f%n", "Change", roundToCents(amountPaid - getTotal())));
         } else {
             receipt.append("Not paid yet\n");
         }
         return receipt.toString();
+    }
+
+    // Rebuilds a paid sale from saved data. Stock is not reduced again, because the saved stock
+    // levels already include this sale. Called by StadiumShop.restoreTransaction.
+    void restorePaid(Map<Product, Integer> savedItems, double savedAmountPaid, LocalDateTime savedDateTime) {
+        requireUnpaid();
+        items.putAll(savedItems);
+        amountPaid = roundToCents(savedAmountPaid);
+        dateTime = savedDateTime;
+        paid = true;
+        customer.addPurchase(this);
     }
 
     private void requireUnpaid() {

@@ -8,16 +8,18 @@
 package oop_project.entities;
 
 public abstract class Person {
+    public static final int MAX_AGE = 120;
+
     protected String Id;
     protected String name;
     protected int age;
     protected String gender;
 
     public Person(String id, String name, int age, String gender) {
-        Id = id;
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
+        setId(id);
+        setName(name);
+        setAge(age);
+        setGender(gender);
     }
 
     public String getId() {
@@ -25,7 +27,10 @@ public abstract class Person {
     }
 
     public void setId(String id) {
-        Id = id;
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("ID is required.");
+        }
+        Id = id.trim();
     }
 
     public String getName() {
@@ -33,7 +38,10 @@ public abstract class Person {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name is required.");
+        }
+        this.name = name.trim();
     }
 
     public int getAge() {
@@ -41,6 +49,9 @@ public abstract class Person {
     }
 
     public void setAge(int age) {
+        if (age < 0 || age > MAX_AGE) {
+            throw new IllegalArgumentException("Age must be between 0 and " + MAX_AGE + ".");
+        }
         this.age = age;
     }
 
@@ -49,7 +60,10 @@ public abstract class Person {
     }
 
     public void setGender(String gender) {
-        this.gender = gender;
+        if (gender == null || gender.isBlank()) {
+            throw new IllegalArgumentException("Gender is required.");
+        }
+        this.gender = gender.trim();
     }
 
 
@@ -62,4 +76,9 @@ public abstract class Person {
     }
 
     public abstract String getRole();
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

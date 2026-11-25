@@ -18,68 +18,60 @@ Each member owns entity classes plus one or more parts of every other folder: en
 
 **Completed**
 - [x] Initial repository, README and UML class diagram
+- [x] League classes (green in the UML diagram): `FootballTeam`, `FootballLeague`, `Fixture`, `Stadium`, `MatchResult`
+- [x] Enums: `TeamStatus`, `FixtureStatus`, `FieldCondition`
+- [x] Exceptions: `TeamNotEligibleException`, `ScheduleConflictException` (teams and stadiums), `ResultNotRecordedException`
+- [x] Persistence: `LeagueFileManager` (load and save the `data/*.txt` files, writing through a temp file)
+- [x] Persistence: `ProductFile` (random-access `products.dat`, with stock updated after each paid sale)
+- [x] Persistence: `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
+- [x] Exception: `DataFileException`, thrown for a bad line in a data file
+- [x] Demo data in `data/`
+- [x] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
+- [x] Tests: `FixtureTests` (T-08 to T-13)
+- [x] Tests: `PersistenceTests` (T-26)
+- [x] Test evidence: saved test-run output, and the T-27 console transcript in `docs/test-evidence/`
+- [x] UML diagram updated for the finished code, and the PNG export refreshed
+- [x] Drafts of the user guide and technical report (`docs/*.md`)
 
 **To do**
-- [ ] League classes (green in the UML diagram):
-  - [ ] `FootballTeam` (empty stub so far)
-  - [ ] `FootballLeague` (drafted)
-  - [ ] `Fixture` (empty stub so far)
-  - [ ] `Stadium` (drafted)
-  - [ ] `MatchResult` (drafted)
-- [ ] Persistence (`persistence/`):
-  - [ ] `LeagueFileManager`: load and save the `data/*.txt` files, writing through a temp file
-  - [ ] `ProductFile`: random-access `products.dat`, with stock updated after each paid sale
-  - [ ] `FootballLeague.saveData()` and `loadData()`, handing off to `LeagueFileManager`
-  - [ ] Demo data in `data/`
-- [ ] Enums: `TeamStatus`, `FixtureStatus`, `FieldCondition`
-- [ ] Exceptions:
-  - [ ] `DataFileException` (empty so far): thrown for a bad line in a data file
-  - [ ] `TeamNotEligibleException`, `ScheduleConflictException` (teams and stadiums), `ResultNotRecordedException`
-- [ ] Menus: `MainMenu`, `InputHelper`, `StadiumMenu`, `FixtureMenu`, and `Main` to load the data and open `MainMenu`
-- [ ] Tests:
-  - [ ] `FixtureTests` (T-08 to T-13)
-  - [ ] `PersistenceTests` (T-26)
-  - [ ] T-27 manual test (letters typed where a number is expected): screenshot in `docs/test-evidence/`
+- [ ] T-27 manual test: add a screenshot of the run to `docs/test-evidence/`
 
 ### Kemece Hinds (2501990)
 
 **Completed**
-- _None recorded yet_
+- [x] Person hierarchy (blue in the UML diagram, plus `Person`): `Person`, `Player`, `Coach`, `LeagueCommissioner`, `MatchOfficial`, `Spectator`
+- [x] Enums: `PlayerStatus`
+- [x] Exception: `InvalidDataException` rejects players under `Player.MIN_AGE` (through `Player.isEligible`)
+- [x] Exception: `ScheduleConflictException` stops a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
+- [x] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
+- [x] Tests: `TeamTests` (T-01 to T-07)
+- [x] Tests: `ResultTests` (T-17 to T-20, T-28)
 
 **To do**
-- [ ] Person hierarchy (blue in the UML diagram, plus `Person`). In progress:
-  - [ ] `Person`
-  - [ ] `Player`
-  - [ ] `Coach`
-  - [ ] `LeagueCommissioner`
-  - [ ] `MatchOfficial`
-  - [ ] `Spectator`
 - [ ] SRS document (in progress). `docs/KPFL_SRS_AI_Reference.pdf` is an AI-generated reference to guide it.
-- [ ] Enums: `PlayerStatus`
-- [ ] Exceptions:
-  - [ ] `InvalidDataException`: reject players under `Player.MIN_AGE` (the minimum-age rule; not enforced yet)
-  - [ ] `ScheduleConflictException`: stop a match official being assigned to clashing fixtures (`MatchOfficial.assignTo`)
-- [ ] Menus: `TeamMenu`, `PersonnelMenu`, `OfficialMenu`, `ResultsMenu`
-- [ ] Tests:
-  - [ ] `TeamTests` (T-01 to T-07)
-  - [ ] `ResultTests` (T-17 to T-20, T-28)
 
 ### Shenecia Williams (2501202)
 
 **Completed**
 - [x] Shop and ticket classes (orange in the UML diagram): `Product`, `FoodItem`, `Merchandise`, `StadiumShop`, `Taxable`, `Tickets`, `Transaction`
+- [x] Enums: `TicketCategory`
+- [x] Shop rules: `Transaction.addItem` refuses a zero quantity and more than is in stock; abandoned sales can be cancelled
+- [x] Menus: `TicketMenu`, `ShopMenu`, `ReportMenu`
+- [x] Tests: `TestRunner` and `Check` (the runner and the PASS/FAIL printer)
+- [x] Tests: `TicketTests` (T-14 to T-16), proving `CapacityExceededException`
+- [x] Tests: `ShopTests` (T-21 to T-25), proving `InsufficientPaymentException` and `OutOfStockException`
 
 **To do**
 - [ ] Presentation slides (in progress)
-- [ ] Enums: `TicketCategory`
-- [ ] Exceptions:
-  - [ ] `CapacityExceededException`: stop ticket sales going over the stadium's capacity
-  - [ ] `InsufficientPaymentException`, `OutOfStockException`: already thrown by `Transaction.pay`; still need tests
-- [ ] Menus: `TicketMenu`, `ShopMenu`, `ReportMenu`
-- [ ] Tests:
-  - [ ] `TestRunner` and `Check` (the runner and the PASS/FAIL printer). Do these first, because everyone's tests need them.
-  - [ ] `TicketTests` (T-14 to T-16)
-  - [ ] `ShopTests` (T-21 to T-25)
+
+### Whole group
+
+**To do**
+- [ ] Confirm the minimum player age (16 is assumed) with the lecturer
+- [ ] Review the drafts of `docs/User_Guide.md` and `docs/Technical_Report.md`, then export them to PDF
+- [ ] Test plan and results document (`docs/Test_Plan_and_Results.pdf`), using `docs/test-evidence/`
+- [ ] List sources and AI assistance in the technical report, as the course policy requires
+- [ ] Each member's reflection in `docs/reflections/`
 
 ## Activity log
 
@@ -93,3 +85,14 @@ Each member owns entity classes plus one or more parts of every other folder: en
 | 2026-11-15 | Amar Campbell | Wrote the README: project summary, team and responsibilities, features, build, run and test steps, and layout | `README.md` |
 | 2026-11-15 | Amar Campbell | Assigned the enum, exception, menu and test work to each member, and took persistence | `CONTRIBUTION_LOG.md` |
 | 2026-11-15 | Amar Campbell | Added a reference SRS generated with Claude (AI) to guide Kemece's own SRS. It is not Kemece's work and not the group's final SRS. | `docs/KPFL_SRS_AI_Reference.pdf` |
+| 2026-11-21 | Amar Campbell | League classes: wrote `FootballTeam` (squad and coaching staff, squad-size, minimum-age and jersey rules, match record and points) and `Fixture` (scheduled/completed/cancelled lifecycle, eligibility check, clashes, officials, ticket sales within capacity, results). Added lookups, spectators, reschedule and cancel, and separate standings, fixtures and shop-sales reports to `FootballLeague`. Finished `DataFileException`. | `FootballTeam.java`, `Fixture.java`, `FootballLeague.java`, `DataFileException.java` |
+| 2026-11-21 | Kemece Hinds | Person hierarchy rules: validation in the `Person` setters; `Player.isEligible` (minimum age 16) and `addGoals`; `Coach.assignTeam` keeping the team's staff in step; `MatchOfficial.isAvailableFor` and `assignTo` with the clash check; the commissioner's `approveTeam`, `suspendTeam`, `inspectFixture` and `assignOfficial`. | `Person.java`, `Player.java`, `Coach.java`, `MatchOfficial.java`, `LeagueCommissioner.java` |
+| 2026-11-21 | Shenecia Williams | Shop rules: `Transaction.addItem` throws `InvalidDataException` for a quantity below 1 and `OutOfStockException` beyond the stock; added `removeItem`, `StadiumShop.cancelTransaction`, and restoring paid sales when data is loaded. | `Transaction.java`, `StadiumShop.java` |
+| 2026-11-21 | Amar Campbell | Persistence: `LeagueFileManager` saves the sequential `.txt` files through temporary files and loads them in ID order, skipping and reporting bad lines; `ProductFile` keeps every shop's products in fixed-length records in `products.dat` and rewrites one product's stock in place. `saveData` and `loadData` hand off to them. Added the demo league to `data/`. | `persistence/`, `data/` |
+| 2026-11-21 | Amar Campbell | Console: `Main` loads the data and opens `MainMenu` (ten areas, save, and save-on-exit); `InputHelper` checks every number, date, time and Y/N answer and shows numbered lists; `StadiumMenu` and `FixtureMenu`. | `Main.java`, `menu/MainMenu.java`, `menu/InputHelper.java`, `menu/StadiumMenu.java`, `menu/FixtureMenu.java` |
+| 2026-11-21 | Kemece Hinds | Menus: `TeamMenu` (register, update, search, display, approve or suspend), `PersonnelMenu` (players, goals and coaches), `OfficialMenu` (officials, assignment, inspection, commissioner) and `ResultsMenu` (results and standings). | `menu/TeamMenu.java`, `menu/PersonnelMenu.java`, `menu/OfficialMenu.java`, `menu/ResultsMenu.java` |
+| 2026-11-21 | Shenecia Williams | Menus: `TicketMenu` (sales with GCT by category, seats remaining), `ShopMenu` (products, sales with payment, change and receipt, stock written to `products.dat`) and `ReportMenu` (six reports RPT-01 to RPT-06 and searches SR-01 to SR-04). | `menu/TicketMenu.java`, `menu/ShopMenu.java`, `menu/ReportMenu.java` |
+| 2026-11-21 | Shenecia Williams | Tests: `TestRunner` and `Check` (PASS or FAIL with expected and actual), `TicketTests` (T-14 to T-16) and `ShopTests` (T-21 to T-25). | `tests/TestRunner.java`, `tests/Check.java`, `tests/TicketTests.java`, `tests/ShopTests.java` |
+| 2026-11-21 | Kemece Hinds | Tests: `TeamTests` (T-01 to T-07) and `ResultTests` (T-17 to T-20, T-28). | `tests/TeamTests.java`, `tests/ResultTests.java` |
+| 2026-11-21 | Amar Campbell | Tests: `FixtureTests` (T-08 to T-13) and `PersistenceTests` (T-26). Saved the full test run (83 checks, all passing) and the T-27 console transcript as evidence. | `tests/FixtureTests.java`, `tests/PersistenceTests.java`, `docs/test-evidence/` |
+| 2026-11-21 | Amar Campbell | Updated the UML diagram for the finished code (new members, the menu and persistence classes, "(has-a)" labels) and re-exported the PNG; drafted the user guide and technical report; updated the README and project guide. | `docs/KPFL_UML_Class_Diagram.drawio`, `docs/KPFL_UML_Class_Diagram.png`, `docs/User_Guide.md`, `docs/Technical_Report.md`, `README.md`, `CLAUDE.md` |

@@ -7,9 +7,11 @@
 
 package oop_project.entities;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class StadiumShop {
     private String shopId;
@@ -63,10 +65,50 @@ public class StadiumShop {
     }
 
     public Transaction startTransaction(Spectator customer) {
-        String transactionId = shopId + "-TX" + String.format("%04d", transactions.size() + 1);
+        String transactionId = shopId + "-TX" + String.format("%04d", nextTransactionNumber());
         Transaction transaction = new Transaction(transactionId, customer);
         transactions.add(transaction);
         return transaction;
+    }
+
+    // Drops a sale that was started but never paid, for example when the customer walks away
+    public void cancelTransaction(Transaction transaction) {
+        if (transaction.isPaid()) {
+            throw new IllegalStateException("Transaction " + transaction.getTransactionId() + " has been paid and cannot be cancelled.");
+        }
+        transactions.remove(transaction);
+    }
+
+    // Rebuilds a paid sale from saved data without changing stock.
+    // Used by LeagueFileManager when loading; menus use startTransaction instead.
+    public Transaction restoreTransaction(String transactionId, Spectator customer, Map<Product, Integer> items,
+                                          double amountPaid, LocalDateTime dateTime) {
+        for (Transaction existing : transactions) {
+            if (existing.getTransactionId().equalsIgnoreCase(transactionId)) {
+                throw new IllegalArgumentException("Transaction " + transactionId + " is already recorded.");
+            }
+        }
+        Transaction transaction = new Transaction(transactionId, customer);
+        transaction.restorePaid(items, amountPaid, dateTime);
+        transactions.add(transaction);
+        return transaction;
+    }
+
+    // One more than the highest number used so far, so a new ID never repeats a saved one
+    private int nextTransactionNumber() {
+        int highest = 0;
+        String prefix = shopId + "-TX";
+        for (Transaction transaction : transactions) {
+            String id = transaction.getTransactionId();
+            if (id.startsWith(prefix)) {
+                try {
+                    highest = Math.max(highest, Integer.parseInt(id.substring(prefix.length())));
+                } catch (NumberFormatException ignored) {
+                    // an ID in another format does not affect the numbering
+                }
+            }
+        }
+        return highest + 1;
     }
 
     // Only paid transactions count as sales

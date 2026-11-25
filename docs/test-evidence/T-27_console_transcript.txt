@@ -1,0 +1,80 @@
+T-27 manual test: letters typed where a number, date or time is expected.
+Input typed, one per line: abc|4|1|one|1|2|1|next friday|2026-13-40|2026-12-20|3pm|15:00|0|0|N|Y|
+Expected: each bad entry is refused with a message, the prompt is repeated, and the program keeps running.
+Run on a copy of the demo data, from the folder that holds it.
+--------------------------------------------------------------------------------
+KPFL League and Match-Day Management System
+Loaded 8 teams, 4 stadiums, 9 officials and 19 fixtures from data.
+
+=== Kingston Premier Football League - Season 2026 ===
+ 1. Teams
+ 2. Players & coaches
+ 3. Stadiums
+ 4. Fixtures
+ 5. Match officials
+ 6. Results & standings
+ 7. Ticket sales
+ 8. Stadium shop
+ 9. Reports & search
+10. Save data
+ 0. Exit
+Choose an option (0 to 10): Please enter a whole number from 0 to 10.
+Choose an option (0 to 10): 
+=== Fixtures ===
+ 1. Create fixture
+ 2. Reschedule fixture
+ 3. Cancel fixture
+ 4. Display fixtures
+ 0. Back
+Choose an option (0 to 4): Home team:
+   1. KPFL01  Harbour View (Registered)
+   2. KPFL02  Waterhouse (Registered)
+   3. KPFL03  Arnett Gardens (Registered)
+   4. KPFL04  Cavalier (Registered)
+   5. KPFL05  Mount Pleasant (Registered)
+   6. KPFL06  Portmore United (Registered)
+   7. KPFL07  Tivoli Gardens (Suspended)
+   8. KPFL08  Dunbeholden (Pending)
+   0. Back
+Choose (0 to 8): Please enter a whole number from 0 to 8.
+Choose (0 to 8): Away team:
+   1. KPFL01  Harbour View (Registered)
+   2. KPFL02  Waterhouse (Registered)
+   3. KPFL03  Arnett Gardens (Registered)
+   4. KPFL04  Cavalier (Registered)
+   5. KPFL05  Mount Pleasant (Registered)
+   6. KPFL06  Portmore United (Registered)
+   7. KPFL07  Tivoli Gardens (Suspended)
+   8. KPFL08  Dunbeholden (Pending)
+   0. Back
+Choose (0 to 8): Stadium:
+   1. National Stadium (Good)
+   2. Anthony Spaulding Sports Complex (Excellent)
+   3. Harbour View Mini Stadium (Good)
+   4. Ferdi Neita Sports Complex (Poor)
+   0. Back
+Choose (0 to 4): Date (YYYY-MM-DD): Please enter a real date as YYYY-MM-DD, for example 2026-12-05.
+Date (YYYY-MM-DD): Please enter a real date as YYYY-MM-DD, for example 2026-12-05.
+Date (YYYY-MM-DD): Kick-off time (HH:MM, 24-hour): Please enter a time as HH:MM in 24-hour format, for example 15:00.
+Kick-off time (HH:MM, 24-hour): Fixture FX020 created: Harbour View vs Waterhouse on 2026-12-20 at 15:00 at National Stadium
+
+=== Fixtures ===
+ 1. Create fixture
+ 2. Reschedule fixture
+ 3. Cancel fixture
+ 4. Display fixtures
+ 0. Back
+Choose an option (0 to 4): 
+=== Kingston Premier Football League - Season 2026 ===
+ 1. Teams
+ 2. Players & coaches
+ 3. Stadiums
+ 4. Fixtures
+ 5. Match officials
+ 6. Results & standings
+ 7. Ticket sales
+ 8. Stadium shop
+ 9. Reports & search
+10. Save data
+ 0. Exit
+Choose an option (0 to 10): Save your changes before exiting? (Y/N): Exit without saving? Are you sure? (Y/N): Goodbye.

@@ -51,11 +51,11 @@ javac --release 21 -d out $(find src -name '*.java')
 java -cp out oop_project.Main
 ```
 
-`Main` is still a placeholder: no console menu exists yet.
+`Main` loads `data/` (or the folder given as the first argument) and opens `MainMenu`.
 
 ## Testing
 
-The group decided on plain Java tests with no test library (no JUnit). The test files are still empty. When you write them:
+The group decided on plain Java tests with no test library (no JUnit). The tests cover T-01 to T-28 (83 checks), and they all pass. When you add to them:
 - Put them in the `oop_project.tests` package under `src/`, so the `javac` line above compiles them.
 - Run them with `java -cp out oop_project.tests.TestRunner`.
 - Name each check after its ID in the SRS test plan: T-01 to T-28 in appendix A.3. The plan covers normal, boundary and invalid cases for each business rule. `docs/KPFL_SRS_AI_Reference.pdf` holds that test plan. It is an AI-generated reference SRS, there to guide Kemece's own SRS, so don't present it as Kemece's work or as the group's final `KPFL_SRS.pdf`.
@@ -65,7 +65,7 @@ The group decided on plain Java tests with no test library (no JUnit). The test 
 
 ## Planned layout
 
-The user agreed this layout. The folders and files below exist as empty placeholders: fill them in rather than inventing a different structure. The `.java` files are empty, so add the package line and header comment when you start one. The four PDFs aren't created yet: they get exported when the documents are written. The menu areas, data files and test IDs come from the SRS.
+The user agreed this layout. The folders and files below exist as empty placeholders: fill them in rather than inventing a different structure. All the `.java` files are now written. The user guide and technical report are drafted as Markdown (`docs/User_Guide.md`, `docs/Technical_Report.md`) and get exported to PDF. The SRS PDF and the test plan PDF aren't created yet. The menu areas, data files and test IDs come from the SRS.
 
 ```
 data/                          loaded at start-up, written on Save; committed as the demo sample data
@@ -118,7 +118,7 @@ There are three packages under `oop_project`: `entities` (with `entities/interfa
   - `recordResult` records the score and then completes the fixture.
   - `getStandings` ranks teams by points, then goal difference, then goals scored, then name.
   - `generateReports` builds the text reports.
-  - `saveData` and `loadData` are stubs that throw `UnsupportedOperationException`. The `toFileRecord()` methods on the `Person` subclasses are the start of the file format.
+  - `saveData(folder)` and `loadData(folder)` hand off to `LeagueFileManager`. The `toFileRecord()` methods on `FootballTeam` and the `Person` subclasses write those records.
 - **`Fixture` has a lifecycle.** It goes from `SCHEDULED` to `COMPLETED` or `CANCELLED`. Every mutator calls `requireScheduled`, so a finished fixture throws `IllegalStateException`. `complete()` needs a recorded `MatchResult`.
 
 ### Two-way links
@@ -135,6 +135,15 @@ Each two-way link is kept in sync from one side only. Call the owning method, no
 
 Collection getters return `Collections.unmodifiableList`, so mutate only through these methods.
 
+### Persistence
+
+- `LeagueFileManager` writes each `.txt` file through a `.tmp` file, then moves it over the old one. On load, a bad line throws `DataFileException`; the loader reports it, skips it and keeps going.
+- Files load in ID-dependency order: stadiums, teams, commissioner, players, coaches, officials, fixtures, tickets, products, then transactions. Spectators are rebuilt from tickets and transactions.
+- Team statistics aren't saved. `Fixture.restore` replays each completed result into both teams' records.
+- `Fixture.restore`, `Fixture.restoreTicket`, `StadiumShop.restoreTransaction` and `FootballLeague.restoreFixture` rebuild saved objects without re-checking rules. Only the loader calls them.
+- `ProductFile` holds fixed-length 243-byte records. `ShopMenu` calls `updateStock` after each paid sale.
+- `data/` is the committed demo league, generated through the real classes. Its people are fictional. Don't use real people's names in test or demo data.
+
 ### Composition and generated IDs
 
 - `Stadium` creates its own `StadiumShop` in its constructor (composition).
@@ -142,7 +151,7 @@ Collection getters return `Collections.unmodifiableList`, so mutate only through
 - IDs are generated:
   - fixtures: `FX001`
   - tickets: `<fixtureId>-T0001`
-  - transactions: `<shopId>-TX0001`
+  - transactions: `<shopId>-TX0001`, numbered from the highest existing number. An abandoned sale is removed with `StadiumShop.cancelTransaction`.
 
 ### Money
 
@@ -168,7 +177,7 @@ Collection getters return `Collections.unmodifiableList`, so mutate only through
 
 ## UML diagram
 
-The class diagram is `docs/KPFL_UML_Class_Diagram.drawio`. Update it when entity fields or methods change. `docs/KPFL_UML_Class_Diagram.png` is an export, and it is out of date.
+The class diagram is `docs/KPFL_UML_Class_Diagram.drawio`. Update it when entity fields or methods change. `docs/KPFL_UML_Class_Diagram.png` is an export of it, last updated 2026-11-21.
 
 The user agreed on these notation rules:
 - Attributes and parameters are written `name: Type`, and lists as `List<Type>`.
@@ -177,3 +186,4 @@ The user agreed on these notation rules:
 - Enum types appear as attribute types, but there are no enum boxes.
 - There are no exception classes in the diagram.
 - Composition and aggregation lines are labelled "(has-a)".
+- `~` marks package-private members. A dashed open arrow labelled «use» is a dependency. The menu and persistence classes are pink.

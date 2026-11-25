@@ -13,11 +13,12 @@ public class Coach extends Person {
     private String coachingRole;
     private FootballTeam team;
 
+    // team may be null; the coach then joins a team later through assignTeam or FootballTeam.addCoach
     public Coach(String id, String name, int age, String gender, String qualification, String coachingRole, FootballTeam team) {
         super(id, name, age, gender);
-        this.qualification = qualification;
-        this.coachingRole = coachingRole;
-        this.team = team;
+        setQualification(qualification);
+        setCoachingRole(coachingRole);
+        assignTeam(team);
     }
 
     public String getQualification() {
@@ -25,7 +26,10 @@ public class Coach extends Person {
     }
 
     public void setQualification(String qualification) {
-        this.qualification = qualification;
+        if (qualification == null || qualification.isBlank()) {
+            throw new IllegalArgumentException("Qualification is required.");
+        }
+        this.qualification = qualification.trim();
     }
 
     public String getCoachingRole() {
@@ -33,25 +37,41 @@ public class Coach extends Person {
     }
 
     public void setCoachingRole(String coachingRole) {
-        this.coachingRole = coachingRole;
+        if (coachingRole == null || coachingRole.isBlank()) {
+            throw new IllegalArgumentException("Coaching role is required.");
+        }
+        this.coachingRole = coachingRole.trim();
     }
 
     public FootballTeam getTeam() {
         return team;
     }
 
-    public void setTeam(FootballTeam team) {
-        this.team = team;
+    // A coach works for at most one team. Moving to a new team removes the coach from the old one.
+    // Pass null to take the coach off their team.
+    public void assignTeam(FootballTeam newTeam) {
+        if (newTeam == team) {
+            return;
+        }
+        if (team != null) {
+            team.coachLeft(this);
+        }
+        team = newTeam;
+        if (newTeam != null) {
+            newTeam.coachJoined(this);
+        }
     }
 
     @Override
     public String displayInfo() {
-        return super.displayInfo() + ", Qualification: " + qualification + ", Coaching Role: " + coachingRole + ", Team: " + team;
+        return super.displayInfo() + ", Qualification: " + qualification + ", Coaching Role: " + coachingRole
+                + ", Team: " + (team == null ? "None" : team.getName());
     }
 
+    // The team is stored by registration number, or "-" when the coach has no team
     @Override
     public String toFileRecord(){
-        return super.toFileRecord() + "," + qualification + "," + coachingRole + "," + team;
+        return super.toFileRecord() + "," + qualification + "," + coachingRole + "," + (team == null ? "-" : team.getRegistrationNo());
     }
 
     @Override
